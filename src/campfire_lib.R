@@ -138,7 +138,7 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
         from_info <- ServerValues$nodes[ServerValues$nodes$id == edge_info$from, ]
         from_info <- from_info[!is.na(from_info$id), ]
         from_query <- list(q = edge_info$from, colname = from_info$colname)
-        ServerValues$data_subset <- getEdgeSubset(ServerValues$data, to_query, from_query, edge_info$colname)
+        ServerValues$data_subset <- getEdgeSubset(ServerValues$data, to_query, from_query, edge_info$colname, ServerValues$nodes)
       }
     })
   
@@ -371,8 +371,9 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
     serverFunct(ServerValues, output, session)
     
   })
-  
-  shinyApp(ui, server = campfire_server)
+  shinyApp(ui, server = campfire_server
+           #,options = list(port = 8000, shiny.autoreload = TRUE)
+           )
 }
 
 campfireUI = function(controller, wall, floor, datamonitor, urlmonitor) {

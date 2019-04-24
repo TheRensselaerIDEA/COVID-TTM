@@ -71,10 +71,13 @@ campfireApp(
   serverFunct = function(ServerValues, output, session) {
     
     # Update text box when JSON file changes.
-    observeEvent(ServerValues$json_file, {
-      text <- read_file(ServerValues$json_file$datapath)
-      updateTextInput(session, "text_input", value = text)
-    })
+    # observeEvent(ServerValues$json_file, {
+    #   if(!is.null(ServerValues$json_file))
+    #   {
+    #     text <- read_file(ServerValues$json_file$datapath)
+    #     updateTextInput(session, "text_input", value = text)
+    #   }
+    # })
 
 
     output$network <- renderVisNetwork(
@@ -87,17 +90,18 @@ campfireApp(
         #     visNodes(scaling = list("min" = 10, "max" = 50)) %>%
         #     # After drawing the network, center on 0,0 to keep position
         #     # independant of node number
-        #     visEvents(type = "once", beforeDrawing = "function() {
-        #       this.moveTo({
-        #                     position: {
-        #                       x: 0,
-        #                       y: 0
-        #                     },
-        #               scale: 1
-        #       })
-        #       Shiny.onInputChange('current_node_id', -1);
-        #       Shiny.onInputChange('current_edge_index', -1);
-        #     }") %>%
+            visEvents(type = "once", beforeDrawing = "function() {
+              this.moveTo({
+                            position: {
+                              x: 0,
+                              y: 0
+                            },
+                      scale: 1
+              })
+            }") %>%
+            #   Shiny.onInputChange('current_node_id', -1);
+            #   Shiny.onInputChange('current_edge_index', -1);
+            # }") %>%
         #     visPhysics(stabilization = FALSE, enabled = FALSE) %>%
         #     visInteraction(dragView = FALSE, zoomView = FALSE) %>%
         #     # Define behavior when clicking on nodes or edges
@@ -145,9 +149,10 @@ campfireApp(
     {
       if(ServerValues$network_selected != "")
       {
-        node_name <- ServerValues$nodes$label[ServerValues$nodes$id == ServerValues$network_selected]
-        node_name <- node_name[!is.na(node_name)]
-        node_size <- nrow(ServerValues$data_subset)
+        node_info <- ServerValues$nodes[ServerValues$nodes$id == ServerValues$network_selected, ]
+        node_info <- node_info[!is.na(node_info), ]
+        node_size <- node_info$value
+        node_name <- node_info$name
         tags$div(
           tags$h1(style = paste0("color:", color.blue), node_name),
           tags$h2(style = paste0("color:", color.blue), paste("Size:", node_size)))
@@ -155,12 +160,12 @@ campfireApp(
       else if(ServerValues$network_selected_e != "")
       {
         edge_data <- ServerValues$edges[ServerValues$network_selected_e, ]
-        to_node_name <- ServerValues$nodes$label[ServerValues$nodes$id == edge_data$to]
+        to_node_name <- ServerValues$nodes$name[ServerValues$nodes$id == edge_data$to]
         to_node_name <- to_node_name[!is.na(to_node_name)]
-        from_node_name <- ServerValues$nodes$label[ServerValues$nodes$id == edge_data$from]
+        from_node_name <- ServerValues$nodes$name[ServerValues$nodes$id == edge_data$from]
         from_node_name <- from_node_name[!is.na(from_node_name)]
         edge_name <- paste(to_node_name, "AND", from_node_name)
-        edge_size <- nrow(ServerValues$data_subset)
+        edge_size <- edge_data$value
         tags$div(
           tags$h1(style = paste0("color:", color.blue), edge_name),
           tags$h1(style = paste0("color:", color.blue), paste("Type:", edge_data$colname)),

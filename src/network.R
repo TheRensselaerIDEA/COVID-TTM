@@ -128,6 +128,7 @@ getNode <- function(data, node_query)
                      value = node_value,
                      x = 0,
                      y = 0,
+                     name = node_query$name,
                      colname = node_query$query$colname,
                      colvalue = node_query$query$q,
                      hidden = is.na(node_value),
@@ -221,10 +222,14 @@ getEdge <- function(data, to_query, from_query, colname, nodes)
   {
     size <- nrow(edge_subset)
   }
-  edge <- data.frame(to = to_query$q,
-                     from = from_query$q,
-                     value = size)
-  edge
+  if(size != 0)
+  {
+    edge <- data.frame(to = to_query$q,
+                       from = from_query$q,
+                       value = size)
+    edge
+  }
+  else {NULL}
 }
 
 #' Gets all graph node edge data from data.
@@ -254,10 +259,13 @@ getEdges <- function(data, node_queries, edge_colnames, nodes)
                         subset_queries[[node_combinations[ ,i][2]]],
                         edge_colnames[[j]],
                         nodes)
-        edge$colname <- edge_colnames[[j]]
-        edge$color <- edge_colors[[j]]
-        edge$smooth <- list(list("type" = "continuous", "roundness" = rounds[[j]]))
-        edges <- rbind(edges, edge)
+        if(!is.null(edge))
+        {
+          edge$colname <- edge_colnames[[j]]
+          edge$color <- edge_colors[[j]]
+          edge$smooth <- list(list("type" = "continuous", "roundness" = rounds[[j]]))
+          edges <- rbind(edges, edge)
+        }
       }
     }
   }
