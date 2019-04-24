@@ -29,7 +29,7 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
     #' We keep track of the monitor domain so the load bar will have priority there if it is open.
     #' TODO: Better implementation of loadbar
     updateComplete <- reactive(
-      {
+    {
       if(is.null(ServerValues$monitor.domain)) 
       {
         d <- getDefaultReactiveDomain()
@@ -39,54 +39,37 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
         d <- ServerValues$monitor.domain
       }
       withProgress(message = "Reloading...", value = 0, session = d, {
-        if(!is.null(ServerValues$json_file))
+        if(is.null(ServerValues$json_file))
         {
-          fp <- ServerValues$json_file$datapath
-          tryCatch({
-            incProgress(0, detail = "Getting Data...", session = d)
-            parsed_json <- fromJSON(fp, nullValue = NA, simplify = FALSE)
-            ServerValues$data <- fetchData(parsed_json$data_file)
-            ServerValues$edge_colnames <- parsed_json$edge_colnames
-            incProgress(.2, detail = "Creating Nodes...", session = d)
-            ServerValues$nodes <- getNodes(ServerValues$data, parsed_json$nodes)
-            incProgress(.2, detail = "Creating Edges...", session = d)
-            ServerValues$edges <- getEdges(ServerValues$data, parsed_json$nodes, ServerValues$edge_colnames, ServerValues$nodes)
-            incProgress(.2, detail = "Creating Network...", session = d)
-            ServerValues$network <- getNetwork(ServerValues$nodes, ServerValues$edges)
-            incProgress(.2, detail = "Creating Wall...", session = d)
-            ServerValues$col_list <- updateWall(ServerValues$data, ServerValues$nodes)
-            incProgress(.2, detail = "Finished", session = d)
-          },
-          error=function(err) {
-            print(paste0("Error loading JSON at ", fp))
-            print(err)
-          },
-          warning=function(warning) {
-            print(paste0("Warning loading JSON at ", fp))
-            print(warning)
-          }
-        )
+          fp <- "test/test_ALLGROUPS.json"
         }
-        
-        
-        
-        # ServerValues$data <- fetchData("data/period_5.df.Rdata")
-        # nodes <- getNodes(ServerValues$data, parseTextQuery("'1, group, 1' '2, group, 2'"))
-        # edges <- getEdges(ServerValues$data, nodes, ServerValues$edge_type)
-        # ServerValues$network <- getNetwork(nodes, edges)
-        
-        # ServerValues$data <- getData(serverValues$queries,
-        #                              serverValues$number_tweets,
-        #                              FALSE,
-        #                              token,
-        #                              serverValues$search_type)
-        # incProgress(1/3, detail = "Generating Wall", session = d)
-        # ServerValues$nodes <- getNodes(serverValues$data, serverValues$queries)
-        # ServerValues$edges <- getEdges(serverValues$data, serverValues$nodes$id)
-        # ServerValues$col_list <- updateWall(serverValues$data, serverValues$nodes)
-        # incProgress(1/3, detail = "Generating Graph", session = d)
-        # ServerValues$current_node_id = -1
-        # ServerValues$current_edge_index = -1
+        else
+        {
+          fp <- ServerValues$json_file$datapath 
+        }
+        tryCatch({
+          incProgress(0, detail = "Getting Data...", session = d)
+          parsed_json <- fromJSON(fp, nullValue = NA, simplify = FALSE)
+          ServerValues$data <- fetchData(parsed_json$data_file)
+          ServerValues$edge_colnames <- parsed_json$edge_colnames
+          incProgress(.2, detail = "Creating Nodes...", session = d)
+          ServerValues$nodes <- getNodes(ServerValues$data, parsed_json$nodes)
+          incProgress(.2, detail = "Creating Edges...", session = d)
+          ServerValues$edges <- getEdges(ServerValues$data, parsed_json$nodes, ServerValues$edge_colnames, ServerValues$nodes)
+          incProgress(.2, detail = "Creating Network...", session = d)
+          ServerValues$network <- getNetwork(ServerValues$nodes, ServerValues$edges)
+          incProgress(.2, detail = "Creating Wall...", session = d)
+          ServerValues$col_list <- updateWall(ServerValues$data, ServerValues$nodes)
+          incProgress(.2, detail = "Finished", session = d)
+        },
+        error=function(err) {
+          print(paste0("Error loading JSON at ", fp))
+          print(err)
+        },
+        warning=function(warning) {
+          print(paste0("Warning loading JSON at ", fp))
+          print(warning)
+        })
       })
     })
     
