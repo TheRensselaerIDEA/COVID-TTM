@@ -124,13 +124,11 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
         from_info <- ServerValues$nodes[ServerValues$nodes$id == edge_info$from, ]
         from_info <- from_info[!is.na(from_info$id), ]
         from_query <- list(q = edge_info$from, colname = from_info$colname)
-        View(ServerValues$data)
-        print(to_query)
-        print(from_query)
-        print(edge_info$colname)
-        View(ServerValues$nodes)
-        ServerValues$data_subset <- getEdgeSubset(ServerValues$data, to_query, from_query, edge_info$colname, ServerValues$nodes)
-        View(ServerValues$data_subset)
+        ServerValues$data_subset <- getEdgeSubset(ServerValues$data,
+                                                  to_query,
+                                                  from_query,
+                                                  edge_info$colname,
+                                                  ServerValues$nodes[!is.na(ServerValues$nodes$id), ])
       }
       else
       {
@@ -154,32 +152,32 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
       # serverValues$col_list <- UpdateWall(serverValues$data, serverValues$queries)
     })
 
-    # # Observe when text on the wall is clicked, and update query and wall/floor
-    # observeEvent(input$clicked_text, {
-    #   # Determine what was clicked on the wall and update the appropriate values.
-    #   #
-    #   # Event:
-    #   #   Text is clicked on the wall.
-    #   updateValues()
-    #   if(substr(serverValues$clicked_text, 1, 1) == "#" ||  substr(serverValues$clicked_text, 1, 1) == "@") {
-    #     if(toupper(serverValues$clicked_text) %in% toupper(serverValues$queries)) {
-    #       index <- which(toupper(serverValues$queries) %in% toupper(serverValues$clicked_text))
-    #       text <- serverValues$queries[index]
-    #       serverValues$current_node_id <- text
-    #       serverValues$data_subset <- getDataSubset(serverValues$data, text)
-    #       serverValues$current_node_id = -1
-    #       serverValues$current_edge_index = -1
-    #     } else {
-    #       index <- which(is.na(serverValues$queries))[1]
-    #       if(!is.na(index)) {
-    #         serverValues$queries[[index]] <- serverValues$clicked_text
-    #         updateComplete()
-    #       }
-    #     }
-    #   } else {
-    #     serverValues$url <- input$clicked_text
-    #   }
-    # })
+    # Observe when text on the wall is clicked, and update query and wall/floor
+    observeEvent(input$clicked_text, {
+      # Determine what was clicked on the wall and update the appropriate values.
+      #
+      # Event:
+      #   Text is clicked on the wall.
+      updateValues()
+      if(substr(ServerValues$clicked_text, 1, 1) == "#" ||  substr(ServerValues$clicked_text, 1, 1) == "@") {
+        # if(toupper(ServerValues$clicked_text) %in% toupper(ServerValues$queries)) {
+        #   index <- which(toupper(ServerValues$queries) %in% toupper(ServerValues$clicked_text))
+        #   text <- ServerValues$queries[index]
+        #   serverValues$current_node_id <- text
+        #   serverValues$data_subset <- getDataSubset(ServerValues$data, text)
+        #   serverValues$current_node_id = -1
+        #   serverValues$current_edge_index = -1
+        # } else {
+        #   index <- which(is.na(ServerValues$queries))[1]
+        #   if(!is.na(index)) {
+        #     serverValues$queries[[index]] <- ServerValues$clicked_text
+        #     updateComplete()
+        #   }
+        # }
+      } else {
+        ServerValues$url <- input$clicked_text
+      }
+    })
     # 
     # observeEvent(input$end_position, {
     #   # Change column positions based on moved nodes.

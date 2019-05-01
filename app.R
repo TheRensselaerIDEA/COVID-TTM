@@ -266,15 +266,15 @@ campfireApp(
     #   
     # })
     # 
-    # output$frame <- renderUI({
-    #   if(!is.null(serverValues$url)) {
-    #     redirectScript <- paste0("window = window.open('", serverValues$url, "');")
-    #     tags$script(HTML(redirectScript))
-    #   } else {
-    #     redirectScript <- paste0("window = window.open('", "https://docs.google.com/presentation/d/1g_q5qQTJAt4jVekozFlEsnEo4XdveubVzLC2t9aeWlo/present", "');")
-    #     tags$script(HTML(redirectScript))
-    #   }
-    # })
+    output$frame <- renderUI({
+      if(!is.null(ServerValues$url)) {
+        redirectScript <- paste0("window = window.open('", ServerValues$url, "');")
+        tags$script(HTML(redirectScript))
+      } else {
+        redirectScript <- paste0("window = window.open('", "https://docs.google.com/presentation/d/1g_q5qQTJAt4jVekozFlEsnEo4XdveubVzLC2t9aeWlo/present", "');")
+        tags$script(HTML(redirectScript))
+      }
+    })
     # 
     # observeEvent(serverValues$current_node_id, {
     #   visNetworkProxy("network") %>%

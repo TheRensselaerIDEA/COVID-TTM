@@ -220,7 +220,12 @@ getEdge <- function(data, to_query, from_query, colname, nodes, edge_color, edge
   {
     edge <- data.frame(to = to_query$q,
                        from = from_query$q,
-                       value = size)
+                       value = size,
+                       stringsAsFactors = FALSE)
+    edge$colname <- colname
+    edge$color <- edge_color
+    edge$smooth <- list(list("type" = "continuous", "roundness" = edge_rounds))
+    edge$id <- edge_id
     edge
   }
   else {NULL}
@@ -258,13 +263,7 @@ getEdges <- function(data, node_queries, edge_colnames, nodes)
                         rounds[[j]],
                         next_id)
         next_id <- next_id + 1
-        if(!is.null(edge))
-        {
-          edge$colname <- edge_colnames[[j]]
-          edge$color <- edge_colors[[j]]
-          edge$smooth <- list(list("type" = "continuous", "roundness" = rounds[[j]]))
-          edges <- rbind(edges, edge)
-        }
+        edges <- rbind(edges, edge)
       }
     }
   }
