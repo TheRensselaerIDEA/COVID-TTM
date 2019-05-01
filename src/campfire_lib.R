@@ -12,7 +12,7 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
                                  # type = "none")
   
   campfire_server <- shinyServer(function(input, output, session) 
-    {
+  {
     
     #' Updates the central serverValues with the input values from a SPECIFIC window.
     #' Whatever domain calls this will update its input values with serverValues.
@@ -41,13 +41,10 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
       withProgress(message = "Reloading...", value = 0, session = d, {
         if(is.null(ServerValues$json_file))
         {
-          fp <- "test/test_ALLGROUPS.json"
-        }
-        else
-        {
-          fp <- ServerValues$json_file$datapath 
+          ServerValues$json_file <- data.frame(datapath = "test/test_ALLGROUPS.json", stringsAsFactors = FALSE)
         }
         tryCatch({
+          fp <- ServerValues$json_file$datapath
           incProgress(0, detail = "Getting Data...", session = d)
           parsed_json <- fromJSON(fp, nullValue = NA, simplify = FALSE)
           ServerValues$data <- fetchData(parsed_json$data_file)
@@ -107,6 +104,10 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
         node_info <- node_info[!is.na(node_info$id), ]
         ServerValues$data_subset <- getSubset(ServerValues$data, list(q = node_info$id, colname = node_info$colname))
       }
+      else
+      {
+        ServerValues$data_subset <- NULL
+      }
     })
     
     # Observe when an edge is clicked.
@@ -121,7 +122,17 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
         from_info <- ServerValues$nodes[ServerValues$nodes$id == edge_info$from, ]
         from_info <- from_info[!is.na(from_info$id), ]
         from_query <- list(q = edge_info$from, colname = from_info$colname)
+        View(ServerValues$data)
+        print(to_query)
+        print(from_query)
+        print(edge_info$colname)
+        View(ServerValues$nodes)
         ServerValues$data_subset <- getEdgeSubset(ServerValues$data, to_query, from_query, edge_info$colname, ServerValues$nodes)
+        View(ServerValues$data_subset)
+      }
+      else
+      {
+        ServerValues$data_subset <- NULL
       }
     })
   

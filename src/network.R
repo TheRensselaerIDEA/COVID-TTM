@@ -1,5 +1,3 @@
-count <- 0
-
 #' Fetches tweet from database.
 #'
 #' @param Rdata_file Path to an Rdata file.
@@ -181,11 +179,8 @@ getNodes <- function(data, node_queries)
 #' @return Subset of data containing rows from to_query, from_query that share common colname content.
 getEdgeSubset <- function(data, to_query, from_query, colname, nodes)
 {
-  #print(paste0("starting", count))
   node1_indices <- nodes$orig_indices[nodes$id == to_query$q][[1]]
   node2_indices <- nodes$orig_indices[nodes$id == from_query$q][[1]]
-  # node1_indices <- node1_indices$orig_indices
-  # node2_indices <- node2_indices$orig_indices
   to_node_subset <- data[node1_indices, ]
   from_node_subset <- data[node2_indices, ]
   subset <- rbind(to_node_subset, from_node_subset)
@@ -193,8 +188,6 @@ getEdgeSubset <- function(data, to_query, from_query, colname, nodes)
   from_content <- unique(unlist(from_node_subset[ , colname]))
   shared_content <- intersect(to_content, from_content)
   tmps <- vector(mode = "list", length = length(shared_content))
-  #print(paste0("ending", count))
-  count <<- count + 1
   if(length(shared_content > 0))
   {
     for(i in 1:length(tmps))
@@ -230,6 +223,17 @@ getEdge <- function(data, to_query, from_query, colname, nodes)
     edge
   }
   else {NULL}
+}
+
+#' Gets single edge dataframe row.
+#'
+#' @param data Dataframe with tweet data.
+#' @param to_query Query representing the start node.
+#' @param from_query Query representing the end node.
+#' @param colname Column name to search in to create edges.
+#' @return Edge data frame to to_query from from_query.
+getDirectedEdge  <- function(data, to_query, from_query, to_colname, from_colname, nodes)
+{
 }
 
 #' Gets all graph node edge data from data.

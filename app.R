@@ -71,13 +71,13 @@ campfireApp(
   serverFunct = function(ServerValues, output, session) {
     
     # Update text box when JSON file changes.
-    # observeEvent(ServerValues$json_file, {
-    #   if(!is.null(ServerValues$json_file))
-    #   {
-    #     text <- read_file(ServerValues$json_file$datapath)
-    #     updateTextInput(session, "text_input", value = text)
-    #   }
-    # })
+    observeEvent(ServerValues$json_file, {
+      if(!is.null(ServerValues$json_file))
+      {
+        text <- read_file(ServerValues$json_file$datapath)
+        updateTextInput(session, "text_input", value = text)
+      }
+    })
 
 
     output$network <- renderVisNetwork(
@@ -194,36 +194,37 @@ campfireApp(
         )
       )
     })
-    # 
-    # output$top.users.bar.extern <- renderPlot({
-    #   serverValues$monitor.domain <- getDefaultReactiveDomain()
-    #   if(!is.null(serverValues$data_subset)) {
-    #     serverValues$data_subset %>% 
-    #       count(screen_name) %>% 
-    #       arrange(desc(n)) %>%
-    #       slice(1:10) %>%
-    #       ggplot(aes(reorder(screen_name, n), n)) + 
-    #         geom_col(fill = color.blue, color = color.blue) + 
-    #         coord_flip() + 
-    #         labs(x = "Screen Name", y = "Tweets", title = "Top 10 Users") + 
-    #         theme_dark() +
-    #         theme(plot.background = element_rect(fill = color.back, color = NA),
-    #               axis.text = element_text(size = 20, colour = color.white),
-    #               text = element_text(size = 20, colour = color.blue))
-    #   } else {
-    #     serverValues$data %>%
-    #       count(query) %>%
-    #       ggplot(aes(reorder(query, n), n)) +
-    #         geom_col(fill = color.blue, color = color.blue) +
-    #         coord_flip() +
-    #         labs(x = "Query", y = "Number of Tweets", title = "Tweet Composition") +
-    #         theme_dark() +
-    #         theme(panel.border = element_blank(),
-    #             plot.background = element_rect(fill = "#151E29", color = NA),
-    #             axis.text = element_text(size = 20, colour = "#f0f0f0"),
-    #             text = element_text(size = 20, colour = "#1D8DEE"))
-    #   }
-    # })
+
+    output$top.users.bar.extern <- renderPlot({
+      ServerValues$monitor.domain <- getDefaultReactiveDomain()
+      if(!is.null(ServerValues$data_subset)) {
+        ServerValues$data_subset %>%
+          count(user_screen_name) %>%
+          arrange(desc(n)) %>%
+          slice(1:10) %>%
+          ggplot(aes(reorder(user_screen_name, n), n)) +
+            geom_col(fill = color.blue, color = color.blue) +
+            coord_flip() +
+            labs(x = "Screen Name", y = "Tweets", title = "Top 10 Users") +
+            theme_dark() +
+            theme(plot.background = element_rect(fill = color.back, color = NA),
+                  axis.text = element_text(size = 20, colour = color.white),
+                  text = element_text(size = 20, colour = color.blue))
+      } else {
+        ServerValues$data %>%
+          count(user_screen_name) %>%
+          arrange(desc(n)) %>%
+          slice(1:10) %>%
+          ggplot(aes(reorder(user_screen_name, n), n)) +
+          geom_col(fill = color.blue, color = color.blue) +
+          coord_flip() +
+          labs(x = "Screen Name", y = "Tweets", title = "Top 10 Users") +
+          theme_dark() +
+          theme(plot.background = element_rect(fill = color.back, color = NA),
+                axis.text = element_text(size = 20, colour = color.white),
+                text = element_text(size = 20, colour = color.blue))
+      }
+    })
     # 
     # output$top.hashtags.bar.extern <- renderPlot({
     #   if(!is.null(serverValues$data_subset)) {
