@@ -1,5 +1,3 @@
-count <- 0
-
 #' Fetches tweet from database.
 #'
 #' @param Rdata_file Path to an Rdata file.
@@ -132,7 +130,8 @@ getNode <- function(data, node_query)
                      colname = node_query$query$colname,
                      colvalue = node_query$query$q,
                      hidden = is.na(node_value),
-                     stringsAsFactors = FALSE)
+                     stringsAsFactors = FALSE,
+                     query = node_query)
   node$orig_indices <- list(node_orig_indices)
   node
 }
@@ -181,11 +180,8 @@ getNodes <- function(data, node_queries)
 #' @return Subset of data containing rows from to_query, from_query that share common colname content.
 getEdgeSubset <- function(data, to_query, from_query, colname, nodes)
 {
-  #print(paste0("starting", count))
   node1_indices <- nodes$orig_indices[nodes$id == to_query$q][[1]]
   node2_indices <- nodes$orig_indices[nodes$id == from_query$q][[1]]
-  # node1_indices <- node1_indices$orig_indices
-  # node2_indices <- node2_indices$orig_indices
   to_node_subset <- data[node1_indices, ]
   from_node_subset <- data[node2_indices, ]
   subset <- rbind(to_node_subset, from_node_subset)
@@ -193,8 +189,6 @@ getEdgeSubset <- function(data, to_query, from_query, colname, nodes)
   from_content <- unique(unlist(from_node_subset[ , colname]))
   shared_content <- intersect(to_content, from_content)
   tmps <- vector(mode = "list", length = length(shared_content))
-  #print(paste0("ending", count))
-  count <<- count + 1
   if(length(shared_content > 0))
   {
     for(i in 1:length(tmps))
@@ -214,7 +208,7 @@ getEdgeSubset <- function(data, to_query, from_query, colname, nodes)
 #' @param from_query Query representing the end node.
 #' @param colname Column name to search in to create edges.
 #' @return Edge data frame to to_query from from_query.
-getEdge <- function(data, to_query, from_query, colname, nodes)
+getEdge <- function(data, to_query, from_query, colname, nodes, edge_color, edge_rounds, edge_id)
 {
   size <- 0
   edge_subset <- getEdgeSubset(data, to_query, from_query, colname, nodes)
@@ -248,6 +242,7 @@ getEdges <- function(data, node_queries, edge_colnames, nodes)
   node_combinations <- combn(1:length(subset_queries), 2)
   rounds <- seq(0, .5, length.out = length(edge_colnames))
   edge_colors <- c("#c51f5d", "white", "#008080")
+  next_id <- 1
   for(i in 1:ncol(node_combinations))
   {
     if(!is.na(subset_queries[[node_combinations[ ,i][1]]]) && !is.na(subset_queries[[node_combinations[ ,i][2]]]))
@@ -258,7 +253,11 @@ getEdges <- function(data, node_queries, edge_colnames, nodes)
                         subset_queries[[node_combinations[ ,i][1]]],
                         subset_queries[[node_combinations[ ,i][2]]],
                         edge_colnames[[j]],
-                        nodes)
+                        nodes,
+                        edge_colors[[j]],
+                        rounds[[j]],
+                        next_id)
+        next_id <- next_id + 1
         if(!is.null(edge))
         {
           edge$colname <- edge_colnames[[j]]
@@ -269,7 +268,6 @@ getEdges <- function(data, node_queries, edge_colnames, nodes)
       }
     }
   }
-  edges$id <- 1:nrow(edges)
   edges
 }
 
@@ -291,5 +289,62 @@ getNetwork <- function(nodes, edges)
     visInteraction(dragView = FALSE, zoomView = FALSE) %>%
     visOptions(nodesIdSelection = TRUE) %>%
     visEvents(deselectEdge = "function(e) {Shiny.onInputChange('network_selected_e', '');}") %>%
-    visEvents(selectEdge = "function(e) {if(e.nodes.length == 0){Shiny.onInputChange('network_selected_e', e.edges);}}")
+    visEvents(selectEdge = "function(e) {if(e.nodes.length == 0){Shiny.onInputChange('network_selected_e', e.edges);}}") %>%
+    visEvents(
+      doubleClick = "function() {
+                                       if(this.getSelectedNodes().length == 1) {
+                                         Shiny.onInputChange('delete_node', this.getSelectedNodes()[0]);
+                                         this.deleteSelected();
+                                         Shiny.onInputChange('current_node_id', -1);
+                                         Shiny.onInputChange('current_edge_index', -1);
+                                       }
+                                     }"
+      # click = "function(properties) {
+      #           if(this.getSelectedNodes().length == 1) {
+      #             Shiny.onInputChange('current_node_id', this.getSelectedNodes()[0]);
+      #             Shiny.onInputChange('current_edge_index', -1);
+      #           } else if(this.getSelectedEdges().length == 1) {
+      #             Shiny.onInputChange('current_edge_index', this.body.data.edges.get(properties.edges[0]).index);
+      #             Shiny.onInputChange('current_node_id', -1);
+      #           } else {
+      #             Shiny.onInputChange('current_node_id', -1);
+      #             Shiny.onInputChange('current_edge_index', -1);
+      #           }
+      #         }",
+      # dragStart = "function() {
+      #              var sel = this.getSelectedNodes();
+      #              if(sel.length == 1) {
+      #                Shiny.onInputChange('current_node_id', this.getSelectedNodes()[0]);
+      #                Shiny.onInputChange('current_edge_index', -1)
+      #                Shiny.onInputChange('start_position', this.getPositions(sel[0]))
+      #              }
+      #            }",
+      # dragEnd = "function() {
+      #              var sel = this.getSelectedNodes();
+      #              if(sel.length == 1) {
+      #                Shiny.onInputChange('end_position', this.getPositions(sel[0]))
+      #              }
+      #            }"
+      #   nodes_with_coords <- getCoords(serverValues$nodes)
+      # other commented out stuff that was in
+      #   visNetwork(nodes_with_coords, serverValues$edges) %>%
+      #     visEdges(scaling = list("min" = 0), smooth = list("enabled" = TRUE)) %>%
+      #     visNodes(scaling = list("min" = 10, "max" = 50)) %>%
+      #     # After drawing the network, center on 0,0 to keep position
+      #     # independant of node number
+      #     visEvents(type = "once", beforeDrawing = "function() {
+      #       this.moveTo({
+      #                     position: {
+      #                       x: 0,
+      #                       y: 0
+      #                     },
+      #               scale: 1
+      #       })
+      #       Shiny.onInputChange('current_node_id', -1);
+      #       Shiny.onInputChange('current_edge_index', -1);
+      #     }") %>%
+      #     visPhysics(stabilization = FALSE, enabled = FALSE) %>%
+      #     visInteraction(dragView = FALSE, zoomView = FALSE) %>%
+      #     # Define behavior when clicking on nodes or edges
+    )
 }

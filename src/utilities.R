@@ -11,10 +11,34 @@ colors <- c("#1D8DEE", "#1dee7e", "#ee7e1d", "#ee1d8d", "#64B0F3", "#64F3A6", "#
 
 # Misc Functions ----------------------------------------------------------
 
-parseColumnQuery <- function(string, name) {
+parseColumnQuery <- function(string) {
   if (substring(string, 1, 1) == "#") {
     hashtagText <- substring(string, 2)
-    query <- createNodeQuery(hashtagText, "hashtags", name)
+    query <- createNodeQuery(hashtagText, "hashtags", string)
+    return(query)
+  }
+  if (substring(string, 1, 1) == "@") {
+    mentionText <- substring(string, 2)
+    query <- createNodeQuery(mentionText, "user_screen_name", string)
+    return(query)
+  }
+  if (grepl(" ", string)) {
+    splitString <- strsplit(string, " ", fixed = TRUE)
+    if (length(splitString) == 0 & length(splitString[[1]]) < 2) {
+      return(NULL)
+    }
+    colname <- splitString[[1]][1]
+    value <- splitString[[1]][2]
+    name <- if (length(splitString[[1]]) > 2) {
+      splitString[[1]][3]
+    } else {
+      string
+    }
+    if (colname %in% c("mention", "mentions")) {
+      query <- createNodeQuery(value, "user_mentions", name)
+      return(query)
+    }
+    query <- createNodeQuery(value, colname, name)
     return(query)
   }
   return(NULL)
@@ -22,8 +46,8 @@ parseColumnQuery <- function(string, name) {
 
 createNodeQuery <- function(q, colname, name)
 {
-  query <- structure(list(q = q, colname = colname), class = "Query")
-  node_query <- structure(list(query = query, name = name), class = "NodeQuery")
+  query <- structure(list(q = q, colname = colname))
+  node_query <- structure(list(query = query, name = name))
   node_query
 }
 
