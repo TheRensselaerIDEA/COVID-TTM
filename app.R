@@ -20,7 +20,11 @@ campfireApp(
     h1("Controller"),
     fileInput("json_file", "JSON Input", accept = c("application/json")),
     textAreaInput("text_input", "JSON Text", height = '200px'),
-    #checkboxGroupInput("edge_input", "Select Edges", c("hashtags", "groups")),
+    # selectInput(inputId = "edge_type",
+    #             label = "Edge Type:",
+    #             choices = list("hashtag", "tweet"),
+    #             selected = "hashtag"
+    #             ),
     actionButton(inputId = "update",
                   label = "Update"),
     style = "position: absolute; 
@@ -80,8 +84,8 @@ campfireApp(
     })
 
 
-    output$network <- renderVisNetwork(
-    {
+    # render the floor
+    output$network <- renderVisNetwork({
       if (!is.null(ServerValues$network)) {
         ServerValues$network %>%
         #   nodes_with_coords <- getCoords(serverValues$nodes)
@@ -168,7 +172,6 @@ campfireApp(
         edge_size <- edge_data$value
         tags$div(
           tags$h1(style = paste0("color:", color.blue), edge_name),
-          tags$h1(style = paste0("color:", color.blue), paste("Type:", edge_data$colname)),
           tags$h2(style = paste0("color:", color.blue), paste("Size:", edge_size)))
       }
       else
