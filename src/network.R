@@ -16,6 +16,9 @@ fetchData <- function(Rdata_file) {
   data$expanded_urls <- lapply(data$expanded_urls, function(x) {
     unlist(x)  
   })
+  data$created_at <- sapply(data$created_at, function(x) {
+    as.POSIXct(x, format="%a %b %d %H:%M:%S %z %Y")
+  })
   # Add column to track row of tweet in main dataframe.
   data$orig_index <- 1:nrow(data)
   remove(df_name)

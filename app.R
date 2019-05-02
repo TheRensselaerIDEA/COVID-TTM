@@ -4,6 +4,7 @@ library(tidyverse)
 library(ggplot2)
 library(useful)
 library(assertthat)
+library(lubridate)
 library(RJSONIO)
 
 source("app-only-auth-twitter.R")
@@ -19,14 +20,14 @@ campfireApp(
   controller = div(
     h1("Controller"),
     fileInput("json_file", "JSON Input", accept = c("application/json")),
+    actionButton(inputId = "update",
+                 label = "Update"),
     textAreaInput("text_input", "JSON Text", height = '200px'),
     # selectInput(inputId = "edge_type",
     #             label = "Edge Type:",
     #             choices = list("hashtag", "tweet"),
     #             selected = "hashtag"
     #             ),
-    actionButton(inputId = "update",
-                  label = "Update"),
     style = "position: absolute; 
     top: 50%; left: 50%; 
     margin-right: -50%; 
@@ -60,7 +61,7 @@ campfireApp(
              plotOutput("top.users.bar.extern", height = "920px")
              ),
       column(6,
-             plotOutput("top.hashtags.bar.extern", height = "920px")
+             plotOutput("tweets.by.time", height = "920px")
              )
     ),
     style = paste0("background: ", color.back, ";
@@ -200,72 +201,36 @@ campfireApp(
 
     output$top.users.bar.extern <- renderPlot({
       ServerValues$monitor.domain <- getDefaultReactiveDomain()
-      if(!is.null(ServerValues$data_subset)) {
-        ServerValues$data_subset %>%
-          count(user_screen_name) %>%
-          arrange(desc(n)) %>%
-          slice(1:10) %>%
-          ggplot(aes(reorder(user_screen_name, n), n)) +
-            geom_col(fill = color.blue, color = color.blue) +
-            coord_flip() +
-            labs(x = "Screen Name", y = "Tweets", title = "Top 10 Users") +
-            theme_dark() +
-            theme(plot.background = element_rect(fill = color.back, color = NA),
-                  axis.text = element_text(size = 20, colour = color.white),
-                  text = element_text(size = 20, colour = color.blue))
-      } else {
-        ServerValues$data %>%
-          count(user_screen_name) %>%
-          arrange(desc(n)) %>%
-          slice(1:10) %>%
-          ggplot(aes(reorder(user_screen_name, n), n)) +
+      ServerValues$data_subset %>%
+        count(user_screen_name) %>%
+        arrange(desc(n)) %>%
+        slice(1:10) %>%
+        ggplot(aes(reorder(user_screen_name, n), n)) +
           geom_col(fill = color.blue, color = color.blue) +
           coord_flip() +
           labs(x = "Screen Name", y = "Tweets", title = "Top 10 Users") +
           theme_dark() +
           theme(plot.background = element_rect(fill = color.back, color = NA),
-                axis.text = element_text(size = 20, colour = color.white),
-                text = element_text(size = 20, colour = color.blue))
-      }
+                  axis.text = element_text(size = 20, colour = color.white),
+                  text = element_text(size = 20, colour = color.blue))
     })
-    # 
-    # output$top.hashtags.bar.extern <- renderPlot({
-    #   if(!is.null(serverValues$data_subset)) {
-    #     serverValues$data_subset %>%
-    #       filter(!is.na(hashtags)) %>%
-    #       unnest(hashtags) %>%
-    #       mutate(hashtags = toupper(hashtags)) %>%
-    #       filter(!(paste("#", hashtags, sep = "") %in% toupper(unique(serverValues$data$query)))) %>%
-    #       count(hashtags) %>%
-    #       arrange(desc(n)) %>%
-    #       slice(1:10) %>%
-    #       ggplot(aes(reorder(hashtags, n), n)) +
-    #         geom_col(fill = color.blue, color = color.blue) +
-    #         coord_flip() +
-    #         labs(x = "Hashtag", y = "Frequency", title = "Top 10 Hashtags") +
-    #         theme_dark() +
-    #         theme(panel.border = element_blank(),
-    #               plot.background = element_rect(fill = color.back, color = NA),
-    #               axis.text = element_text(size = 20, colour = color.white),
-    #               text = element_text(size = 20, colour = color.blue))
-    #   } else {
-    #     serverValues$data %>% 
-    #       distinct(screen_name, source) %>%
-    #       count(source) %>% 
-    #       filter(n >= 5) %>%
-    #       ggplot(aes(reorder(source, n), n)) + 
-    #         geom_col(fill = color.blue, color = color.blue) +
-    #         coord_flip() + 
-    #         labs(x = "Source", y = "Tweets", title = "Tweets by source", subtitle = "sources with >=5 tweets") +
-    #         theme_dark() +
-    #         theme(panel.border = element_blank(),
-    #             plot.background = element_rect(fill = color.back, color = NA),
-    #             axis.text = element_text(size = 20, colour = color.white),
-    #             text = element_text(size = 20, colour = color.blue))
-    #   }
-    #   
-    # })
-    # 
+
+    output$tweets.by.time <- renderPlot({
+      ServerValues$data_subset %>%
+        group_by(group) %>%
+        mutate(date = date(as_datetime(created_at))) %>%
+        count(date) %>%
+        ggplot(aes(x = date, y = n, group = group)) +
+        scale_colour_hue(h = c(180, 300)) +
+        geom_line(aes(color = factor(group)), size = 2) +
+        labs(x = "Date", y = "Number of Tweets", title = "Tweets vs. Time") +
+        theme_dark() +
+        theme(plot.background = element_rect(fill = color.back, color = NA),
+              axis.text = element_text(size = 20, colour = color.white),
+              text = element_text(size = 20, colour = color.blue),
+              legend.background = element_rect(fill = color.back))
+    })
+
     output$frame <- renderUI({
       if(!is.null(ServerValues$url)) {
         redirectScript <- paste0("window = window.open('", ServerValues$url, "');")

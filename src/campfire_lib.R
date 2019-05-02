@@ -47,6 +47,7 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
             incProgress(0, detail = "Getting Data...", session = d)
             parsed_json <- fromJSON(fp, nullValue = NA, simplify = FALSE)
             ServerValues$data <- fetchData(parsed_json$data_file)
+            ServerValues$data_subset <- ServerValues$data
             ServerValues$edge_colnames <- parsed_json$edge_colnames
             incProgress(.2, detail = "Creating Nodes...", session = d)
             ServerValues$nodes <- getNodes(ServerValues$data, parsed_json$nodes)
@@ -108,7 +109,7 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
       }
       else
       {
-        ServerValues$data_subset <- NULL
+        ServerValues$data_subset <- ServerValues$data
       }
     })
     
@@ -132,7 +133,7 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
       }
       else
       {
-        ServerValues$data_subset <- NULL
+        ServerValues$data_subset <- ServerValues$data
       }
     })
   
