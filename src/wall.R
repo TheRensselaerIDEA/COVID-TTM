@@ -50,9 +50,8 @@ UpdateColumn <- function(data_subset, current_node_data, queries, col_num) {
                   #textInput(paste0("text.column.", col_num), label = ""),
                   #actionButton(paste0("button.column.", col_num), "Submit"),
                   textInput(paste0("text.label.column.", col_num), label = "", value = header_text),
-                  actionButton(paste0("button.label.column.", col_num), "Edit label"),
                   #fluidRow(style = 'height: 600px;
-                  fluidRow(style = 'height: 500px;
+                  fluidRow(style = 'height: 535px;
                   overflow-y: auto;
                   overflow-x: hidden;',
                            if(nrow(data_subset) > 0) {
@@ -61,7 +60,10 @@ UpdateColumn <- function(data_subset, current_node_data, queries, col_num) {
                            }
                   ),
                   fluidRow(
-                    tags$h2(tags$span(class = "clickable", header_text))
+                    style = paste0('border-left: 10px solid ', color.blue, ';'),
+                    tags$h2(
+                      align = "center",
+                      tags$span(class = "clickable", header_text))
                   )
          )
   )
