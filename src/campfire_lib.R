@@ -158,11 +158,10 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
       #   Node is double clicked on the floor
       #ServerValues$nodes <- ServerValues$nodes[ServerValues$nodes$id != input$delete_node, ]
       deletedIndex <- which(!is.na(ServerValues$nodes$id) & ServerValues$nodes$id == input$delete_node)[1]
-      ServerValues$nodes[deletedIndex]$hidden <- TRUE
+      ServerValues$nodes[deletedIndex, ]$hidden <- TRUE
+      ServerValues$nodes[deletedIndex, ]$id <- NA
       ServerValues$col_list[[deletedIndex]] <- getEmptyColumn(deletedIndex)
       updateValues()
-      #serverValues$data_subset <- NULL
-      # serverValues$col_list <- UpdateWall(serverValues$data, serverValues$queries)
     })
 
     # # Observe when text on the wall is clicked, and update query and wall/floor
@@ -447,6 +446,6 @@ updateAll <- function(serverValues, queryString, colNum) {
     }
   }
   serverValues$network <- getNetwork(serverValues$nodes, serverValues$edges)
-  serverValues$col_list[[colNum]] <- getColumn(serverValues$data, newNode, colNum) 
+  serverValues$col_list[[colNum]] <- getColumn(serverValues$data, newNode, colNum)
   return(serverValues)
 }
