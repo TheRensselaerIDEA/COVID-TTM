@@ -11,9 +11,9 @@ data <- fetchData(parsed_json$data_file)
 data$test <- sample(1:10, nrow(data), replace = T)
 edge_colname <- parsed_json$edge_colname
 nodes <- getNodes(data, parsed_json$nodes)
-edges <- getEdges(data, parsed_json$nodes, edge_colname)
+edges <- getEdges(data, parsed_json$nodes, edge_colname, nodes)
 edges$color <- "black"
-edges2 <- getEdges(data, parsed_json$nodes, "test")
+edges2 <- getEdges(data, parsed_json$nodes, "test", nodes)
 edges2$color <- "red"
 edges <- rbind(edges, edges2)
 edges$id <- 1:nrow(edges)

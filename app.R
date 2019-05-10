@@ -8,7 +8,7 @@ library(lubridate)
 library(RJSONIO)
 library(parallel)
 
-source("app-only-auth-twitter.R")
+#source("app-only-auth-twitter.R")
 source("src/floor.R")
 source("src/wall.R")
 source("src/network.R")

@@ -41,19 +41,27 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
       withProgress(message = "Reloading...", value = 0, session = d, {
         if(is.null(ServerValues$json_file))
         {
-          ServerValues$json_file <- data.frame(datapath = "test/test_ALLGROUPS.json", stringsAsFactors = FALSE)
+          ServerValues$json_file <- data.frame(datapath = "test/test_ALLGROUPS_new.json", stringsAsFactors = FALSE)
           fp <- ServerValues$json_file$datapath
           tryCatch({
             incProgress(0, detail = "Getting Data...", session = d)
             parsed_json <- fromJSON(fp, nullValue = NA, simplify = FALSE)
             ServerValues$data <- fetchData(parsed_json$data_file)
             ServerValues$data_subset <- ServerValues$data
+            ServerValues$url_map <- getUrlMap(ServerValues$data)
             ServerValues$edge_colnames <- parsed_json$edge_colnames
             incProgress(.2, detail = "Creating Nodes...", session = d)
-            ServerValues$nodes <- getNodes(ServerValues$data, parsed_json$nodes)
+            columnQueries <- lapply(parsed_json$nodes, function(query) {
+              if (query != "") {
+                parseColumnQuery(query)
+              }
+              else {
+                createNodeQuery(NA, NA, NA, NA)
+              }
+            })
+            ServerValues$nodes <- getNodes(ServerValues$data, columnQueries)
             incProgress(.2, detail = "Creating Edges...", session = d)
-            ServerValues$edges <- getEdges(ServerValues$data, parsed_json$nodes, ServerValues$edge_colnames, ServerValues$nodes)
-            print("We got the graph")
+            ServerValues$edges <- getEdges(ServerValues$data, columnQueries, ServerValues$edge_colnames, ServerValues$nodes)
             incProgress(.2, detail = "Creating Network...", session = d)
             ServerValues$network <- getNetwork(ServerValues$nodes, ServerValues$edges)
             incProgress(.2, detail = "Creating Wall...", session = d)
@@ -157,30 +165,47 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
       # serverValues$col_list <- UpdateWall(serverValues$data, serverValues$queries)
     })
 
-    # Observe when text on the wall is clicked, and update query and wall/floor
+    # # Observe when text on the wall is clicked, and update query and wall/floor
     observeEvent(input$clicked_text, {
-      # Determine what was clicked on the wall and update the appropriate values.
-      #
-      # Event:
-      #   Text is clicked on the wall.
+    #   # Determine what was clicked on the wall and update the appropriate values.
+    #   #
+    #   # Event:
+    #   #   Text is clicked on the wall.
       updateValues()
-      if(substr(ServerValues$clicked_text, 1, 1) == "#" ||  substr(ServerValues$clicked_text, 1, 1) == "@") {
-        # if(toupper(ServerValues$clicked_text) %in% toupper(ServerValues$queries)) {
-        #   index <- which(toupper(ServerValues$queries) %in% toupper(ServerValues$clicked_text))
-        #   text <- ServerValues$queries[index]
-        #   serverValues$current_node_id <- text
-        #   serverValues$data_subset <- getDataSubset(ServerValues$data, text)
-        #   serverValues$current_node_id = -1
-        #   serverValues$current_edge_index = -1
-        # } else {
-        #   index <- which(is.na(ServerValues$queries))[1]
-        #   if(!is.na(index)) {
-        #     serverValues$queries[[index]] <- ServerValues$clicked_text
-        #     updateComplete()
-        #   }
-        # }
-      } else {
-        ServerValues$url <- input$clicked_text
+      if(substr(input$clicked_text, 1, 1) == "#" ||  substr(input$clicked_text, 1, 1) == "@") {
+        openColumns <- which(is.na(ServerValues$nodes$id))
+        if (length(openColumns) > 0) {
+          colNum <- openColumns[1]
+          queryString <- paste0("label:",input$clicked_text, " ", input$clicked_text)
+          ServerValues <- updateAll(ServerValues, queryString, colNum)
+        }
+    #     if(toupper(serverValues$clicked_text) %in% toupper(serverValues$queries)) {
+    #       index <- which(toupper(serverValues$queries) %in% toupper(serverValues$clicked_text))
+    #       text <- serverValues$queries[index]
+    #       serverValues$current_node_id <- text
+    #       serverValues$data_subset <- getDataSubset(serverValues$data, text)
+    #       serverValues$current_node_id = -1
+    #       serverValues$current_edge_index = -1
+    #     } else {
+    #       index <- which(is.na(serverValues$queries))[1]
+    #       if(!is.na(index)) {
+    #         serverValues$queries[[index]] <- serverValues$clicked_text
+    #         updateComplete()
+    #       }
+    #     }
+    #   } else {
+    #     serverValues$url <- input$clicked_text
+      } 
+      else {
+        if (!is.na(ServerValues$url_map[input$clicked_text])) {
+          openColumns <- which(is.na(ServerValues$nodes$id))
+          if (length(openColumns) > 0) {
+            colNum <- openColumns[1]
+            expandedUrl <- as.character(ServerValues$url_map[input$clicked_text])
+            queryString <- paste0("label:", expandedUrl, " url:", expandedUrl)
+            ServerValues <- updateAll(ServerValues, queryString, colNum)
+          }
+        }  
       }
     })
     # 
@@ -333,102 +358,7 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
       updateComplete()
     })
     
-    # editing column labels
-    observeEvent({
-      input$button.label.column.1
-    }, {
-      updateValues()
-      ServerValues <- editLabel(ServerValues, input$text.label.column.1, 1)
-      updateComplete()
-    })
-    
-    observeEvent({
-      input$button.label.column.2
-    }, {
-      updateValues()
-      ServerValues <- editLabel(ServerValues, input$text.label.column.2, 2)
-      updateComplete()
-    })
-    
-    observeEvent({
-      input$button.label.column.3
-    }, {
-      updateValues()
-      ServerValues <- editLabel(ServerValues, input$text.label.column.3, 3)
-      updateComplete()
-    })
-    
-    observeEvent({
-      input$button.label.column.4
-    }, {
-      updateValues()
-      ServerValues <- editLabel(ServerValues, input$text.label.column.4, 4)
-      updateComplete()
-    })
-    
-    observeEvent({
-      input$button.label.column.5
-    }, {
-      updateValues()
-      ServerValues <- editLabel(ServerValues, input$text.label.column.5, 5)
-      updateComplete()
-    })
-    
-    observeEvent({
-      input$button.label.column.6
-    }, {
-      updateValues()
-      ServerValues <- editLabel(ServerValues, input$text.label.column.6, 6)
-      updateComplete()
-    })
-    
-    observeEvent({
-      input$button.label.column.7
-    }, {
-      updateValues()
-      ServerValues <- editLabel(ServerValues, input$text.label.column.7, 7)
-      updateComplete()
-    })
-    
-    observeEvent({
-      input$button.label.column.8
-    }, {
-      updateValues()
-      ServerValues <- editLabel(ServerValues, input$text.label.column.8, 8)
-      updateComplete()
-    })
-    
-    observeEvent({
-      input$button.label.column.9
-    }, {
-      updateValues()
-      ServerValues <- editLabel(ServerValues, input$text.label.column.9, 9)
-      updateComplete()
-    })
-    
-    observeEvent({
-      input$button.label.column.10
-    }, {
-      updateValues()
-      ServerValues <- editLabel(ServerValues, input$text.label.column.10, 10)
-      updateComplete()
-    })
-    
-    observeEvent({
-      input$button.label.column.11
-    }, {
-      updateValues()
-      ServerValues <- editLabel(ServerValues, input$text.label.column.11, 11)
-      updateComplete()
-    })
-    
-    observeEvent({
-      input$button.label.column.12
-    }, {
-      updateValues()
-      ServerValues <- editLabel(ServerValues, input$text.label.column.12, 12)
-      updateComplete()
-    })
+  
     
     serverFunct(ServerValues, output, session)
     
@@ -496,7 +426,8 @@ updateAll <- function(serverValues, queryString, colNum) {
       if (serverValues$nodes$id[i] != newNode$id) {
         oldQuery <- createNodeQuery(q = serverValues$nodes$query.query.q[i], 
                                     colname = serverValues$nodes$query.query.colname[i], 
-                                    name = serverValues$nodes$query.name[i])
+                                    name = serverValues$nodes$query.name[i],
+                                    repr = queryString)
         
         rounds <- seq(0, .5, length.out = length(serverValues$edge_colnames))
         edge_colors <- c("#c51f5d", "white", "#008080")
@@ -517,12 +448,5 @@ updateAll <- function(serverValues, queryString, colNum) {
   }
   serverValues$network <- getNetwork(serverValues$nodes, serverValues$edges)
   serverValues$col_list[[colNum]] <- getColumn(serverValues$data, newNode, colNum) 
-  return(serverValues)
-}
-
-editLabel <- function(serverValues, newLabel, colNum) {
-  serverValues$nodes[colNum, ]$name <- newLabel
-  # TODO need more performant way to change the h2 in the column
-  serverValues$col_list[[colNum]] <- getColumn(serverValues$data, serverValues$nodes[colNum, ], colNum)
   return(serverValues)
 }

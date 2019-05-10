@@ -34,7 +34,7 @@ getColumn <- function(data, current_node_data, col_num) {
   UpdateColumn(data_subset, current_node_data, nodes$id, col_num)
 }
 
-UpdateColumn <- function(data_subset, current_node_data, queries, col_num) {
+UpdateColumn <- function(data_subset, current_node_data, queries, col_num, header_at_top = FALSE, demo_mode = TRUE) {
   # Creates a single Shiny HTMl column containing tweet data for specific single query.
   # 
   # Args:
@@ -47,16 +47,17 @@ UpdateColumn <- function(data_subset, current_node_data, queries, col_num) {
   header_text <- current_node_data$name
   column(width = 1,
          tags$div(includeCSS("wall.css"),
-                  #textInput(paste0("text.column.", col_num), label = ""),
-                  #actionButton(paste0("button.column.", col_num), "Submit"),
-                  textInput(paste0("text.label.column.", col_num), label = "", value = header_text),
-                  #fluidRow(style = 'height: 600px;
-                  fluidRow(style = 'height: 535px;
+                  textInput(paste0("text.column.", col_num), label = "", value = current_node_data$query.repr),
+                  actionButton(paste0("button.column.", col_num), "Submit"),
+                  fluidRow(style = 'height: 500px;
                   overflow-y: auto;
                   overflow-x: hidden;',
                            if(nrow(data_subset) > 0) {
-                             #lapply(1:nrow(data_subset), makeRow(data_subset))
-                             lapply(1:nrow(data_subset), makeRow(data_subset))
+                             if (demo_mode) {
+                               lapply(1:25, makeRow(data_subset))
+                             } else {
+                               lapply(1:nrow(data_subset), makeRow(data_subset))
+                             }
                            }
                   ),
                   fluidRow(
@@ -66,6 +67,12 @@ UpdateColumn <- function(data_subset, current_node_data, queries, col_num) {
                       tags$span(class = "clickable", header_text))
                   )
          )
+  )
+}
+
+makeHeader <- function(headerText) {
+  fluidRow(
+    tags$h2(tags$span(class = "clickable", headerText))
   )
 }
 
