@@ -25,18 +25,6 @@ fetchData <- function(Rdata_file) {
   return(data)
 }
 
-getUrlMap <- function(data) {
-  url_map <- c()
-  for (i in 1:nrow(data)) {
-    for (j in 1:length(data$expanded_urls[i])) {
-      url <- unlist(data$urls[i])[j]
-      expanded_url <- unlist(data$expanded_urls[i])[j]
-      url_map[url] <- expanded_url 
-    }
-  }
-  return(url_map)  
-}
-
 #' Gets subset of data.
 #'
 #' @param data Dataframe with tweet data.
@@ -54,7 +42,7 @@ getSubset <- function(data, subset_query) {
           for (j in 1:length(subset_query$colname)) {
             q <- subset_query$q[j]
             colname <- subset_query$colname[j]
-            if (q %in% unlist(data[i, colname])) {
+            if (tolower(q) %in% tolower(unlist(data[i, colname]))) {
               return(TRUE)
             }
           }
@@ -63,7 +51,7 @@ getSubset <- function(data, subset_query) {
         # if q is a vector and colname is not, check q[j] $in$ data[i, colname]
         else {
           colname <- subset_query$colname
-          intersection <- intersect(subset_query$q, unlist(data[i, colname]))
+          intersection <- intersect(tolower(subset_query$q), tolower(unlist(data[i, colname])))
           if (length(intersection) > 0) {
             return(TRUE)
           }
@@ -78,7 +66,7 @@ getSubset <- function(data, subset_query) {
           for (j in 1:length(subset_query$colname)) {
             q <- subset_query$q
             colname <- subset_query$colname[j]
-            if (q %in% unlist(data[i, colname])) {
+            if (tolower(q) %in% tolower(unlist(data[i, colname]))) {
               return(TRUE)
             }
           }
@@ -86,7 +74,7 @@ getSubset <- function(data, subset_query) {
         }
         # if q is not a vector and colname is not, check q %in% data[i, colname]
         else {
-          if(subset_query$q %in% unlist(data[i, subset_query$colname])) {
+          if (tolower(subset_query$q) %in% tolower(unlist(data[i, subset_query$colname]))) {
             return(TRUE)
           } 
           else {
