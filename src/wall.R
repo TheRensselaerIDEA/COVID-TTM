@@ -10,7 +10,7 @@ updateWall <- function(data, nodes) {
   # Returns:
   #   List of Shiny HTML columns containing tweet data.
   col_list <- vector("list", 12)
-  col_list <- lapply(1:12, function(col_num) {
+  col_list <- mclapply(1:12, function(col_num) {
     if(is.na(nodes$id[col_num]) | nodes$hidden[col_num])
     {
       getEmptyColumn(col_num)
@@ -19,7 +19,7 @@ updateWall <- function(data, nodes) {
     {
       getColumn(data, nodes[col_num, ], col_num)
     }
-  })
+  }, mc.cores = 12)
   col_list
 }
 
@@ -56,11 +56,11 @@ UpdateColumn <- function(data_subset, current_node_data, queries, col_num) {
                   overflow-x: hidden;',
                            if(nrow(data_subset) > 0) {
                              #lapply(1:nrow(data_subset), makeRow(data_subset))
-                             lapply(1:25, makeRow(data_subset))
+                             lapply(1:nrow(data_subset), makeRow(data_subset))
                            }
                   ),
                   fluidRow(
-                    style = paste0('border-left: 10px solid ', color.blue, ';'),
+                    style = paste0('border-right: 17px solid ', color.blue, ';'),
                     tags$h2(
                       align = "center",
                       tags$span(class = "clickable", header_text))

@@ -6,6 +6,7 @@ library(useful)
 library(assertthat)
 library(lubridate)
 library(RJSONIO)
+library(parallel)
 
 source("app-only-auth-twitter.R")
 source("src/floor.R")
@@ -23,11 +24,8 @@ campfireApp(
     actionButton(inputId = "update",
                  label = "Update"),
     textAreaInput("text_input", "JSON Text", height = '200px'),
-    # selectInput(inputId = "edge_type",
-    #             label = "Edge Type:",
-    #             choices = list("hashtag", "tweet"),
-    #             selected = "hashtag"
-    #             ),
+    actionButton(inputId = "destroy",
+                 label = "DESTROY"),
     style = "position: absolute; 
     top: 50%; left: 50%; 
     margin-right: -50%; 
@@ -173,6 +171,7 @@ campfireApp(
         edge_size <- edge_data$value
         tags$div(
           tags$h1(style = paste0("color:", color.blue), edge_name),
+          tags$h2(style = paste0("color:", color.blue), paste("Type:", edge_data$colname)),
           tags$h2(style = paste0("color:", color.blue), paste("Size:", edge_size)))
       }
       else
@@ -221,7 +220,7 @@ campfireApp(
         mutate(date = date(as_datetime(created_at))) %>%
         count(date) %>%
         ggplot(aes(x = date, y = n, group = group)) +
-        scale_colour_hue(h = c(180, 300)) +
+        scale_color_brewer(palette = "Spectral") + 
         geom_line(aes(color = factor(group)), size = 2) +
         labs(x = "Date", y = "Number of Tweets", title = "Tweets vs. Time") +
         theme_dark() +

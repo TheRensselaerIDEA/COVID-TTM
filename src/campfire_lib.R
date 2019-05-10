@@ -89,6 +89,10 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
       }
     })
     
+    observeEvent(input$destroy, {
+      stopApp()
+    })
+    
     observeEvent(input$update, {
       # Update the application from the controller text box queries when the update button is pressed.
       #

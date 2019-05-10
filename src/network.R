@@ -164,11 +164,14 @@ updatePositions <- function(nodes) {
 #'  @return Node data frame.
 getNodes <- function(data, node_queries)
 {
-  node_dfs <- vector(mode = "list", length = length(node_queries))
-  for(i in 1:length(node_dfs))
-  {
-    node_dfs[[i]] = getNode(data, node_queries[[i]]) 
-  }
+  # node_dfs <- vector(mode = "list", length = length(node_queries))
+  # for(i in 1:length(node_dfs))
+  # {
+  #   node_dfs[[i]] = getNode(data, node_queries[[i]]) 
+  # }
+  node_dfs <- mclapply(1:length(node_queries), function(i, node_queries) {
+    getNode(data, node_queries[[i]])
+  }, node_queries, mc.cores = length(node_queries))
   nodes <- do.call("rbind", node_dfs)
   nodes <- updatePositions(nodes)
   nodes
@@ -288,7 +291,7 @@ getNetwork <- function(nodes, edges)
     visPhysics(stabilization = FALSE, enabled = FALSE) %>%
     #visPhysics(solver = "barnesHut", 
     #           barnesHut = list(springConstant = 0)) %>%
-    visInteraction(dragView = FALSE, zoomView = FALSE) %>%
+    visInteraction(dragView = FALSE, zoomView = FALSE, dragNodes = FALSE) %>%
     visOptions(nodesIdSelection = TRUE) %>%
     visEvents(deselectEdge = "function(e) {Shiny.onInputChange('network_selected_e', '');}") %>%
     visEvents(selectEdge = "function(e) {if(e.nodes.length == 0){Shiny.onInputChange('network_selected_e', e.edges);}}") %>%
