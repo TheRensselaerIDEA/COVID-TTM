@@ -183,12 +183,17 @@ campfireApp(
     })
     
     output$wall_ui <- renderUI({
-       fluidPage(
-         tags$script(HTML(
-          "$(document).on('click', '.clickable', function () {
-              var text =  $(this).text();
-              Shiny.onInputChange('clicked_text', text);
-            });"
+      fluidPage(
+        tags$script(HTML(
+          "$(document).on('click', '.clickable', function (event) {
+            var text =  $(this).text();
+            if(event.ctrlKey) {
+              Shiny.onInputChange('open_url', true)
+            } else {
+              Shiny.onInputChange('open_url', false)
+            }
+            Shiny.onInputChange('clicked_text', text);
+          });"
         )),
         fluidRow(
           lapply(1:12, function(col.num) {

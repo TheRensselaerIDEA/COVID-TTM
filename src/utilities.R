@@ -10,6 +10,18 @@ colors <- c("#1D8DEE", "#1dee7e", "#ee7e1d", "#ee1d8d", "#64B0F3", "#64F3A6", "#
 
 
 # Misc Functions ----------------------------------------------------------
+getUrlMap <- function(data)
+{
+  url_map <- c()
+  for (i in 1:nrow(data)) {
+    for (j in 1:length(data$expanded_urls[i])) {
+      url <- unlist(data$urls[i])[j]
+      expanded_url <- unlist(data$expanded_urls[i])[j]
+      url_map[url] <- expanded_url 
+    }
+  }
+  url_map
+}
 
 parseQueryTerm <- function(string) {
   # handle hastags with #hashtag

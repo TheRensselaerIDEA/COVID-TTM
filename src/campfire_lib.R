@@ -171,104 +171,35 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
     #   # Event:
     #   #   Text is clicked on the wall.
       updateValues()
-      if(substr(input$clicked_text, 1, 1) == "#" ||  substr(input$clicked_text, 1, 1) == "@") {
+      if(substr(ServerValues$clicked_text, 1, 1) == "#" ||  substr(ServerValues$clicked_text, 1, 1) == "@") {
         openColumns <- which(is.na(ServerValues$nodes$id))
-        if (length(openColumns) > 0) {
+        if(length(openColumns) > 0) {
           colNum <- openColumns[1]
-          queryString <- paste0("label:",input$clicked_text, " ", input$clicked_text)
+          queryString <- paste0("label:", ServerValues$clicked_text, " ", ServerValues$clicked_text)
           ServerValues <- updateAll(ServerValues, queryString, colNum)
         }
-    #     if(toupper(serverValues$clicked_text) %in% toupper(serverValues$queries)) {
-    #       index <- which(toupper(serverValues$queries) %in% toupper(serverValues$clicked_text))
-    #       text <- serverValues$queries[index]
-    #       serverValues$current_node_id <- text
-    #       serverValues$data_subset <- getDataSubset(serverValues$data, text)
-    #       serverValues$current_node_id = -1
-    #       serverValues$current_edge_index = -1
-    #     } else {
-    #       index <- which(is.na(serverValues$queries))[1]
-    #       if(!is.na(index)) {
-    #         serverValues$queries[[index]] <- serverValues$clicked_text
-    #         updateComplete()
-    #       }
-    #     }
-    #   } else {
-    #     serverValues$url <- input$clicked_text
       } 
       else {
-        if (!is.na(ServerValues$url_map[input$clicked_text])) {
-          openColumns <- which(is.na(ServerValues$nodes$id))
-          if (length(openColumns) > 0) {
-            colNum <- openColumns[1]
-            expandedUrl <- as.character(ServerValues$url_map[input$clicked_text])
-            queryString <- paste0("label:", expandedUrl, " url:", expandedUrl)
-            ServerValues <- updateAll(ServerValues, queryString, colNum)
+        if(!is.na(ServerValues$url_map[ServerValues$clicked_text])) {
+          #ServerValues$url <- ServerValues$clicked_text
+          print(ServerValues$open_url)
+          if(ServerValues$open_url) {
+            print("ok")
+            ServerValues$url <- ServerValues$clicked_text 
+          } else {
+            print("alright")
+            openColumns <- which(is.na(ServerValues$nodes$id))
+            if(length(openColumns) > 0) {
+              colNum <- openColumns[1]
+              expandedUrl <- as.character(ServerValues$url_map[ServerValues$clicked_text])
+              queryString <- paste0("label:", expandedUrl, " url:", expandedUrl)
+              ServerValues <- updateAll(ServerValues, queryString, colNum)
+            }
           }
         }  
       }
     })
-    # 
-    # observeEvent(input$end_position, {
-    #   # Change column positions based on moved nodes.
-    #   #
-    #   # Event:
-    #   #   Node is released from drag on the foor.
-    #   updateValues()
-    #   angle <- cart2pol(serverValues$end_position[[1]]$x, -serverValues$end_position[[1]]$y)$theta
-    #   angles <- rev(seq(0, (3/2)*pi, (2 * pi)/12))
-    #   angles <- c(angles, seq((3/2)*pi, 2*pi, (2 * pi)/12)[3:2], 2*pi)
-    #   # Find the closest angle value to the newly calculated
-    #   to_index <- which(abs(angles - angle) == min(abs(angles - angle)))
-    #   # If angle is close to 2pi, set the index to 10
-    #   if(to_index == 13) {
-    #     to_index <- 10
-    #   }
-    #   # Store old values to move the old node
-    #   to_node <- serverValues$queries[[to_index]]
-    #   from_index <- which(serverValues$queries %in% serverValues$current_node_id)
-    #   to_col <- serverValues$col_list[[to_index]]
-    #   start_distance <- ((serverValues$start_position[[1]]$x)^2 + (serverValues$start_position[[1]]$y)^2)^.5
-    #   end_distance <- ((serverValues$end_position[[1]]$x)^2 + (serverValues$end_position[[1]]$y)^2)^.5
-    #   if(start_distance < 187 && end_distance >= 187) {
-    #     # When we move a node from the center to an edge
-    #     visNetworkProxy("network") %>%
-    #       visMoveNode(to_node, 0, 0)
-    #     serverValues$queries[[to_index]] <- serverValues$current_node_id
-    #     serverValues$queries[[from_index]] <- to_node
-    #     serverValues$col_list[[to_index]] <- UpdateColumn(
-    #       getDataSubset(serverValues$data, serverValues$current_node_id),
-    #       serverValues$queries,
-    #       to_index)
-    # 
-    #   } else if(start_distance >= 187 && end_distance < 187) {
-    #     # When we move a node from the edge to the center
-    #     serverValues$queries <- c(serverValues$queries, serverValues$current_node_id)
-    #     serverValues$queries[[from_index]] <- NA
-    #     serverValues$col_list[[from_index]] <- column(width = 1,
-    #                                                  textInput(paste0("text.column.", from_index), label = ""),
-    #                                                  actionButton(paste0("button.column.", from_index), "Submit"))
-    # 
-    # 
-    # 
-    #   # Normal movement, when both nodes are on the edge
-    #   } else if(start_distance >= 187 && end_distance >= 187) {
-    #     # Change the position of the node moved onto
-    #     if(from_index != new_index) {
-    #       visNetworkProxy("network") %>%
-    #         visMoveNode(to_node, serverValues$start_position[[1]]$x, serverValues$start_position[[1]]$y)
-    #       serverValues$queries[to_index] <- serverValues$current_node_id
-    #       serverValues$queries[from_index] <- to_node
-    #       serverValues$col_list[[to_index]] <- serverValues$col_list[[from_index]]
-    #       serverValues$col_list[[from_index]] <- to_col
-    #     }
-    # 
-    #   # Move two nodes in the center
-    #   } else {
-    #     # Do nothing
-    #   }
-      
-      
-    # })
+    
     # Observe all wall buttons, then update query and wall/floor
     observeEvent({
       input$button.column.1
