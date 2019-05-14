@@ -21,9 +21,17 @@ campfireApp(
   controller = div(
     h1("Controller"),
     fileInput("json_file", "JSON Input", accept = c("application/json")),
+    textAreaInput("text_input",
+                  "JSON Text",
+                  value = read_file("test/test_ALLGROUPS_new.json"),
+                  height = '455px',
+                  width = "550px"),
+    selectInput("rdata_file",
+                "RDATA File", 
+                choices = list.files("/data/BLM/TTimeMachinePeriods"),
+                selected = "period_5_5.df.Rdata"),
     actionButton(inputId = "update",
                  label = "Update"),
-    textAreaInput("text_input", "JSON Text", height = '200px'),
     actionButton(inputId = "destroy",
                  label = "DESTROY"),
     style = "position: absolute; 
@@ -74,25 +82,18 @@ campfireApp(
   serverFunct = function(ServerValues, output, session) {
     
     # Update text box when JSON file changes.
-    observeEvent(ServerValues$json_file, {
-      if(!is.null(ServerValues$json_file))
+    observeEvent(ServerValues$parsed_json, {
+      if(!is.null(ServerValues$parsed_json))
       {
-        text <- read_file(ServerValues$json_file$datapath)
+        text <- toJSON(ServerValues$parsed_json, pretty = TRUE)
         updateTextInput(session, "text_input", value = text)
       }
     })
-
 
     # render the floor
     output$network <- renderVisNetwork({
       if (!is.null(ServerValues$network)) {
         ServerValues$network %>%
-        #   nodes_with_coords <- getCoords(serverValues$nodes)
-        #   visNetwork(nodes_with_coords, serverValues$edges) %>%
-        #     visEdges(scaling = list("min" = 0), smooth = list("enabled" = TRUE)) %>%
-        #     visNodes(scaling = list("min" = 10, "max" = 50)) %>%
-        #     # After drawing the network, center on 0,0 to keep position
-        #     # independant of node number
             visEvents(type = "once", beforeDrawing = "function() {
               this.moveTo({
                             position: {
@@ -102,25 +103,7 @@ campfireApp(
                       scale: 1
               })
             }") %>%
-            #   Shiny.onInputChange('current_node_id', -1);
-            #   Shiny.onInputChange('current_edge_index', -1);
-            # }") %>%
-        #     visPhysics(stabilization = FALSE, enabled = FALSE) %>%
-        #     visInteraction(dragView = FALSE, zoomView = FALSE) %>%
-        #     # Define behavior when clicking on nodes or edges
             visEvents(
-                      # click = "function(properties) {
-                      #           if(this.getSelectedNodes().length == 1) {
-                      #             Shiny.onInputChange('current_node_id', this.getSelectedNodes()[0]);
-                      #             Shiny.onInputChange('current_edge_index', -1);
-                      #           } else if(this.getSelectedEdges().length == 1) {
-                      #             Shiny.onInputChange('current_edge_index', this.body.data.edges.get(properties.edges[0]).index);
-                      #             Shiny.onInputChange('current_node_id', -1);
-                      #           } else {
-                      #             Shiny.onInputChange('current_node_id', -1);
-                      #             Shiny.onInputChange('current_edge_index', -1);
-                      #           }
-                      #         }",
                       doubleClick = "function() {
                                        if(this.getSelectedNodes().length == 1) {
                                          Shiny.onInputChange('delete_node', this.getSelectedNodes()[0]);
@@ -129,20 +112,6 @@ campfireApp(
                                          Shiny.onInputChange('current_edge_index', -1);
                                        }
                                      }"
-                      # dragStart = "function() {
-                      #              var sel = this.getSelectedNodes();
-                      #              if(sel.length == 1) {
-                      #                Shiny.onInputChange('current_node_id', this.getSelectedNodes()[0]);
-                      #                Shiny.onInputChange('current_edge_index', -1)
-                      #                Shiny.onInputChange('start_position', this.getPositions(sel[0]))
-                      #              }
-                      #            }",
-                      # dragEnd = "function() {
-                      #              var sel = this.getSelectedNodes();
-                      #              if(sel.length == 1) {
-                      #                Shiny.onInputChange('end_position', this.getPositions(sel[0]))
-                      #              }
-                      #            }"
                     )
             }
         }
@@ -244,11 +213,6 @@ campfireApp(
         tags$script(HTML(redirectScript))
       }
     })
-    # 
-    # observeEvent(serverValues$current_node_id, {
-    #   visNetworkProxy("network") %>%
-    #     visSelectNodes(serverValues$current_node_id)
-    # })
     
   }
 )
