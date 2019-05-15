@@ -39,46 +39,40 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
         d <- ServerValues$monitor.domain
       }
       withProgress(message = "Reloading...", value = 0, session = d, {
-        if(is.null(ServerValues$json_file))
-        {
-          ServerValues$json_file <- data.frame(datapath = "test/test_ALLGROUPS_new.json", stringsAsFactors = FALSE)
-          fp <- ServerValues$json_file$datapath
-          tryCatch({
-            incProgress(0, detail = "Getting Data...", session = d)
-            parsed_json <- fromJSON(fp, nullValue = NA, simplify = FALSE)
-            ServerValues$data <- fetchData(parsed_json$data_file)
-            ServerValues$data_subset <- ServerValues$data
-            ServerValues$url_map <- getUrlMap(ServerValues$data)
-            ServerValues$edge_colnames <- parsed_json$edge_colnames
-            incProgress(.2, detail = "Creating Nodes...", session = d)
-            columnQueries <- lapply(parsed_json$nodes, function(query) {
-              if (query != "") {
-                parseColumnQuery(query)
-              }
-              else {
-                createNodeQuery(NA, NA, NA, NA)
-              }
-            })
-            ServerValues$nodes <- getNodes(ServerValues$data, columnQueries)
-            incProgress(.2, detail = "Creating Edges...", session = d)
-            ServerValues$edges <- getEdges(ServerValues$data, columnQueries, ServerValues$edge_colnames, ServerValues$nodes)
-            incProgress(.2, detail = "Creating Network...", session = d)
-            ServerValues$network <- getNetwork(ServerValues$nodes, ServerValues$edges)
-            incProgress(.2, detail = "Creating Wall...", session = d)
-            ServerValues$col_list <- updateWall(ServerValues$data, ServerValues$nodes)
-            incProgress(.2, detail = "Finished", session = d)
-          },
-          error=function(err) {
-            print(paste0("Error loading JSON at ", fp))
-            print(err)
-          },
-          warning=function(warning) {
-            print(paste0("Warning loading JSON at ", fp))
-            print(warning)
-          }
-        )
-      }
-    })
+        tryCatch({
+          incProgress(0, detail = "Getting Data...", session = d)
+          ServerValues$parsed_json <- fromJSON(ServerValues$text_input, nullValue = NA, simplify = FALSE)
+          ServerValues$data <- fetchData(ServerValues$parsed_json$data_file)
+          ServerValues$data_subset <- ServerValues$data
+          ServerValues$url_map <- getUrlMap(ServerValues$data)
+          ServerValues$edge_colnames <- ServerValues$parsed_json$edge_colnames
+          incProgress(.2, detail = "Creating Nodes...", session = d)
+          columnQueries <- lapply(ServerValues$parsed_json$nodes, function(query) {
+            if (query != "") {
+              parseColumnQuery(query)
+            }
+            else {
+              createNodeQuery(NA, NA, NA, NA)
+            }
+          })
+          ServerValues$nodes <- getNodes(ServerValues$data, columnQueries)
+          incProgress(.2, detail = "Creating Edges...", session = d)
+          ServerValues$edges <- getEdges(ServerValues$data, columnQueries, ServerValues$edge_colnames, ServerValues$nodes)
+          incProgress(.2, detail = "Creating Network...", session = d)
+          ServerValues$network <- getNetwork(ServerValues$nodes, ServerValues$edges)
+          incProgress(.2, detail = "Creating Wall...", session = d)
+          ServerValues$col_list <- updateWall(ServerValues$data, ServerValues$nodes)
+          incProgress(.2, detail = "Finished", session = d)
+        })
+        # error=function(err) {
+        #   print("Error loading JSON")
+        #   print(err)
+        # },
+        # warning=function(warning) {
+        #   print("Warning loading JSON")
+        #   print(warning)
+        # })
+      })
     })  
     
     #' Use the text box input from the controller to replace the current query and update.
@@ -86,6 +80,42 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
       updateValues()
       # ServerValues$queries <- StringQueryToVector(serverValues$queries_string)
       updateComplete()
+    })
+    
+    #' Updates ServerValues$parsed_json when stuff is changed by the user
+    updateJSON <- reactive({
+      new <- list()
+      new$data_file <- ServerValues$rdata_path
+      # Hard code in edge_colnames, not something we change
+      new$edge_colnames <- list("hashtags", "user_mentions", "expanded_urls")
+      new$nodes <- lapply(1:12, function(x) {
+        tmp <- ServerValues$nodes$query.repr[[x]]
+        if(is.na(tmp)) {
+          ""
+        } else {
+          tmp
+        }
+      })
+      names <- sapply(1:12, function(x) {
+        paste0("node", str_pad(x, 2, pad = 0))
+      })
+      names(new$nodes) <- names
+      ServerValues$parsed_json <- new
+    })
+    
+    # Observe when user changes json file from controller
+    observeEvent(input$json_file, {
+      updateValues()
+      # Always change parsed_json so that if we reload the same json the text box will update
+      ServerValues$parsed_json <- NULL
+      fp <- ServerValues$json_file$datapath
+      ServerValues$parsed_json <- fromJSON(fp, nullValue = NA, simplify = FALSE)
+    }, ignoreInit = TRUE)
+    
+    observeEvent(input$rdata_file, {
+      updateValues()
+      ServerValues$rdata_path <- paste0("/data/BLM/TTimeMachinePeriods/", ServerValues$rdata_file)
+      updateJSON()
     })
     
     #' If we are starting for the first time, update everything.
@@ -157,19 +187,30 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
       # Event:
       #   Node is double clicked on the floor
       #ServerValues$nodes <- ServerValues$nodes[ServerValues$nodes$id != input$delete_node, ]
+      updateValues()
       deletedIndex <- which(!is.na(ServerValues$nodes$id) & ServerValues$nodes$id == input$delete_node)[1]
       ServerValues$nodes[deletedIndex, ]$hidden <- TRUE
       ServerValues$nodes[deletedIndex, ]$id <- NA
+      ServerValues$nodes[deletedIndex, ]$name <- NA
+      ServerValues$nodes[deletedIndex, ]$colname <- NA
+      ServerValues$nodes[deletedIndex, ]$colvalue <- NA
+      ServerValues$nodes[deletedIndex, ]$query.query.q <- NA
+      ServerValues$nodes[deletedIndex, ]$query.query.colname <- NA
+      ServerValues$nodes[deletedIndex, ]$query.name <- NA
+      ServerValues$nodes[deletedIndex, ]$query.repr <- NA
+      ServerValues$nodes[deletedIndex, ]$orig_indices <- NA
       ServerValues$col_list[[deletedIndex]] <- getEmptyColumn(deletedIndex)
-      updateValues()
+      ServerValues$data_subset <- ServerValues$data
+      ServerValues$network_selected <- ""
+      updateJSON()
     })
 
-    # # Observe when text on the wall is clicked, and update query and wall/floor
+    # Observe when text on the wall is clicked, and update query and wall/floor
     observeEvent(input$clicked_text, {
-    #   # Determine what was clicked on the wall and update the appropriate values.
-    #   #
-    #   # Event:
-    #   #   Text is clicked on the wall.
+      # Determine what was clicked on the wall and update the appropriate values.
+      #
+      # Event:
+      #   Text is clicked on the wall.
       updateValues()
       if(substr(ServerValues$clicked_text, 1, 1) == "#" ||  substr(ServerValues$clicked_text, 1, 1) == "@") {
         openColumns <- which(is.na(ServerValues$nodes$id))
@@ -182,12 +223,9 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
       else {
         if(!is.na(ServerValues$url_map[ServerValues$clicked_text])) {
           #ServerValues$url <- ServerValues$clicked_text
-          print(ServerValues$open_url)
           if(ServerValues$open_url) {
-            print("ok")
             ServerValues$url <- ServerValues$clicked_text 
           } else {
-            print("alright")
             openColumns <- which(is.na(ServerValues$nodes$id))
             if(length(openColumns) > 0) {
               colNum <- openColumns[1]
@@ -198,6 +236,7 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
           }
         }  
       }
+      updateJSON()
     })
     
     # Observe all wall buttons, then update query and wall/floor
@@ -205,87 +244,85 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
       input$button.column.1
     }, {
       updateValues()
-      ServerValues <- updateAll(ServerValues, input$text.column.1, 1) 
-      updateComplete()
+      ServerValues <- updateAll(ServerValues, input$text.column.1, 1)
+      updateJSON()
     })
     observeEvent({
       input$button.column.2
     }, {
       updateValues()
-      ServerValues <- updateAll(ServerValues, input$text.column.2, 2) 
-      updateComplete()
+      ServerValues <- updateAll(ServerValues, input$text.column.2, 2)
+      updateJSON()
     })
     observeEvent({
       input$button.column.3
     }, {
       updateValues()
-      ServerValues <- updateAll(ServerValues, input$text.column.3, 3) 
+      ServerValues <- updateAll(ServerValues, input$text.column.3, 3)
       updateComplete()
     })
     observeEvent({
       input$button.column.4
     }, {
       updateValues()
-      ServerValues <- updateAll(ServerValues, input$text.column.4, 4)  
-      updateComplete()
+      ServerValues <- updateAll(ServerValues, input$text.column.4, 4)
+      updateJSON()
     })
     observeEvent({
       input$button.column.5
     }, {
       updateValues()
-      ServerValues <- updateAll(ServerValues, input$text.column.5, 5) 
-      updateComplete()
+      ServerValues <- updateAll(ServerValues, input$text.column.5, 5)
+      updateJSON()
     })
     observeEvent({
       input$button.column.6
     }, {
       updateValues()
-      ServerValues <- updateAll(ServerValues, input$text.column.6, 6) 
-      #ServerValues$edges <- getEdges(ServerValues$data, ServerValues$nodes, ServerValues$edge_colnames)
-      #ServerValues$network <- getNetwork(ServerValues$nodes, ServerValues$edges)
-      updateComplete()
+      ServerValues <- updateAll(ServerValues, input$text.column.6, 6)
+      updateJSON()
     })
     observeEvent({
       input$button.column.7
     }, {
       updateValues()
       ServerValues <- updateAll(ServerValues, input$text.column.7, 7)
-      updateComplete()
+      updateJSON()
     })
     observeEvent({
       input$button.column.8
     }, {
       updateValues()
       ServerValues <- updateAll(ServerValues, input$text.column.8, 8)
-      updateComplete()
+      updateJSON()
     })
     observeEvent({
       input$button.column.9
     }, {
       updateValues()
       ServerValues <- updateAll(ServerValues, input$text.column.9, 9)
-      updateComplete()
+      updateJSON()
     })
     observeEvent({
       input$button.column.10
     }, {
       updateValues()
       ServerValues <- updateAll(ServerValues, input$text.column.10, 10)
-      updateComplete()
+      updateJSON()
     })
     observeEvent({
       input$button.column.11
     }, {
       updateValues()
       ServerValues <- updateAll(ServerValues, input$text.column.11, 11)
-      updateComplete()
+      updateJSON()
     })
     observeEvent({
       input$button.column.12
     }, {
       updateValues()
       ServerValues <- updateAll(ServerValues, input$text.column.12, 12)
-      updateComplete()
+      updateJSON()
     })
     
   

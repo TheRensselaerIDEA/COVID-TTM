@@ -6,6 +6,7 @@
 fetchData <- function(Rdata_file) {
   df_name <- load(Rdata_file)
   data <- eval(parse(text = df_name))
+  data <- data[!is.na(data$id_str), ]
   # Convert hashtag column to better format
   data$hashtags <- lapply(data$hashtags, function(x) {
     unlist(x)

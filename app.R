@@ -32,6 +32,7 @@ campfireApp(
                 selected = "period_5_5.df.Rdata"),
     actionButton(inputId = "update",
                  label = "Update"),
+    downloadButton("download", "Download JSON"),
     actionButton(inputId = "destroy",
                  label = "DESTROY"),
     style = "position: absolute; 
@@ -86,9 +87,18 @@ campfireApp(
       if(!is.null(ServerValues$parsed_json))
       {
         text <- toJSON(ServerValues$parsed_json, pretty = TRUE)
+        ServerValues$text_input <- text
         updateTextInput(session, "text_input", value = text)
       }
     })
+    
+    output$download <- downloadHandler(
+      filename = "ttm_output.json",
+      content = function(file) {
+        write(ServerValues$text_input, file)
+      },
+      contentType = "application/json"
+    )
 
     # render the floor
     output$network <- renderVisNetwork({
@@ -147,7 +157,9 @@ campfireApp(
       {
         tags$div(
           tags$h1(style = paste0("color:", color.blue), "Twitter Time Machine"),
-          tags$h2(style = paste0("color:", color.blue), paste("Total number of tweets:", nrow(ServerValues$data))))
+          tags$h2(style = paste0("color:", color.blue), paste("Total number of tweets:", nrow(ServerValues$data))),
+          tags$h2(style = paste0("color:", color.blue), paste("Data:", isolate(ServerValues$parsed_json$data_file)))
+        )      
       }
     })
     
@@ -196,7 +208,7 @@ campfireApp(
         ggplot(aes(x = date, y = n, group = group)) +
         scale_color_brewer(palette = "Spectral") + 
         geom_line(aes(color = factor(group)), size = 2) +
-        labs(x = "Date", y = "Number of Tweets", title = "Tweets vs. Time") +
+        labs(x = "Date", y = "Number of Tweets", title = "Tweets vs. Time", color = "Group") +
         theme_dark() +
         theme(plot.background = element_rect(fill = color.back, color = NA),
               axis.text = element_text(size = 20, colour = color.white),
