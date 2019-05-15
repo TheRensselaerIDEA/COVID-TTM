@@ -350,52 +350,5 @@ getNetwork <- function(nodes, edges)
                                          Shiny.onInputChange('current_edge_index', -1);
                                        }
                                      }"
-      # click = "function(properties) {
-      #           if(this.getSelectedNodes().length == 1) {
-      #             Shiny.onInputChange('current_node_id', this.getSelectedNodes()[0]);
-      #             Shiny.onInputChange('current_edge_index', -1);
-      #           } else if(this.getSelectedEdges().length == 1) {
-      #             Shiny.onInputChange('current_edge_index', this.body.data.edges.get(properties.edges[0]).index);
-      #             Shiny.onInputChange('current_node_id', -1);
-      #           } else {
-      #             Shiny.onInputChange('current_node_id', -1);
-      #             Shiny.onInputChange('current_edge_index', -1);
-      #           }
-      #         }",
-      # dragStart = "function() {
-      #              var sel = this.getSelectedNodes();
-      #              if(sel.length == 1) {
-      #                Shiny.onInputChange('current_node_id', this.getSelectedNodes()[0]);
-      #                Shiny.onInputChange('current_edge_index', -1)
-      #                Shiny.onInputChange('start_position', this.getPositions(sel[0]))
-      #              }
-      #            }",
-      # dragEnd = "function() {
-      #              var sel = this.getSelectedNodes();
-      #              if(sel.length == 1) {
-      #                Shiny.onInputChange('end_position', this.getPositions(sel[0]))
-      #              }
-      #            }"
-      #   nodes_with_coords <- getCoords(serverValues$nodes)
-      # other commented out stuff that was in
-      #   visNetwork(nodes_with_coords, serverValues$edges) %>%
-      #     visEdges(scaling = list("min" = 0), smooth = list("enabled" = TRUE)) %>%
-      #     visNodes(scaling = list("min" = 10, "max" = 50)) %>%
-      #     # After drawing the network, center on 0,0 to keep position
-      #     # independant of node number
-      #     visEvents(type = "once", beforeDrawing = "function() {
-      #       this.moveTo({
-      #                     position: {
-      #                       x: 0,
-      #                       y: 0
-      #                     },
-      #               scale: 1
-      #       })
-      #       Shiny.onInputChange('current_node_id', -1);
-      #       Shiny.onInputChange('current_edge_index', -1);
-      #     }") %>%
-      #     visPhysics(stabilization = FALSE, enabled = FALSE) %>%
-      #     visInteraction(dragView = FALSE, zoomView = FALSE) %>%
-      #     # Define behavior when clicking on nodes or edges
     )
 }

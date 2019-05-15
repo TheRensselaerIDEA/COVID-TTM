@@ -188,21 +188,26 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
       #   Node is double clicked on the floor
       #ServerValues$nodes <- ServerValues$nodes[ServerValues$nodes$id != input$delete_node, ]
       updateValues()
-      deletedIndex <- which(!is.na(ServerValues$nodes$id) & ServerValues$nodes$id == input$delete_node)[1]
-      ServerValues$nodes[deletedIndex, ]$hidden <- TRUE
-      ServerValues$nodes[deletedIndex, ]$id <- NA
-      ServerValues$nodes[deletedIndex, ]$name <- NA
-      ServerValues$nodes[deletedIndex, ]$colname <- NA
-      ServerValues$nodes[deletedIndex, ]$colvalue <- NA
-      ServerValues$nodes[deletedIndex, ]$query.query.q <- NA
-      ServerValues$nodes[deletedIndex, ]$query.query.colname <- NA
-      ServerValues$nodes[deletedIndex, ]$query.name <- NA
-      ServerValues$nodes[deletedIndex, ]$query.repr <- NA
-      ServerValues$nodes[deletedIndex, ]$orig_indices <- NA
-      ServerValues$col_list[[deletedIndex]] <- getEmptyColumn(deletedIndex)
-      ServerValues$data_subset <- ServerValues$data
-      ServerValues$network_selected <- ""
-      updateJSON()
+      updateValues()
+      withProgress(message = "Reloading...", value = 0, session = ServerValues$monitor.domain, {
+        incProgress(0, detail = "Updating Column...", session = ServerValues$monitor.domain)
+        deletedIndex <- which(!is.na(ServerValues$nodes$id) & ServerValues$nodes$id == input$delete_node)[1]
+        ServerValues$nodes[deletedIndex, ]$hidden <- TRUE
+        ServerValues$nodes[deletedIndex, ]$id <- NA
+        ServerValues$nodes[deletedIndex, ]$name <- NA
+        ServerValues$nodes[deletedIndex, ]$colname <- NA
+        ServerValues$nodes[deletedIndex, ]$colvalue <- NA
+        ServerValues$nodes[deletedIndex, ]$query.query.q <- NA
+        ServerValues$nodes[deletedIndex, ]$query.query.colname <- NA
+        ServerValues$nodes[deletedIndex, ]$query.name <- NA
+        ServerValues$nodes[deletedIndex, ]$query.repr <- NA
+        ServerValues$nodes[deletedIndex, ]$orig_indices <- NA
+        ServerValues$col_list[[deletedIndex]] <- getEmptyColumn(deletedIndex)
+        ServerValues$data_subset <- ServerValues$data
+        ServerValues$network_selected <- ""
+        incProgress(1, detail = "Finished...", session = ServerValues$monitor.domain)
+        updateJSON()
+      })
     })
 
     # Observe when text on the wall is clicked, and update query and wall/floor
