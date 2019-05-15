@@ -244,85 +244,133 @@ campfireApp = function(controller = NA, wall = NA, floor = NA, datamonitor = NA,
       input$button.column.1
     }, {
       updateValues()
-      ServerValues <- updateAll(ServerValues, input$text.column.1, 1)
-      updateJSON()
+      withProgress(message = "Reloading...", value = 0, session = ServerValues$monitor.domain, {
+        incProgress(0, detail = "Updating Column...", session = ServerValues$monitor.domain)
+        ServerValues <- updateAll(ServerValues, ServerValues$text.column.1, 1)
+        incProgress(1, detail = "Finished...", session = ServerValues$monitor.domain)
+        updateJSON()
+      })
     })
     observeEvent({
       input$button.column.2
     }, {
       updateValues()
-      ServerValues <- updateAll(ServerValues, input$text.column.2, 2)
-      updateJSON()
+      withProgress(message = "Reloading...", value = 0, session = ServerValues$monitor.domain, {
+        incProgress(0, detail = "Updating Column...", session = ServerValues$monitor.domain)
+        ServerValues <- updateAll(ServerValues, ServerValues$text.column.2, 2)
+        incProgress(1, detail = "Finished...", session = ServerValues$monitor.domain)
+        updateJSON()
+      })
     })
     observeEvent({
       input$button.column.3
     }, {
       updateValues()
-      ServerValues <- updateAll(ServerValues, input$text.column.3, 3)
-      updateComplete()
+      withProgress(message = "Reloading...", value = 0, session = ServerValues$monitor.domain, {
+        incProgress(0, detail = "Updating Column...", session = ServerValues$monitor.domain)
+        ServerValues <- updateAll(ServerValues, ServerValues$text.column.3, 3)
+        incProgress(1, detail = "Finished...", session = ServerValues$monitor.domain)
+        updateJSON()
+      })
     })
     observeEvent({
       input$button.column.4
     }, {
       updateValues()
-      ServerValues <- updateAll(ServerValues, input$text.column.4, 4)
-      updateJSON()
+      withProgress(message = "Reloading...", value = 0, session = ServerValues$monitor.domain, {
+        incProgress(0, detail = "Updating Column...", session = ServerValues$monitor.domain)
+        ServerValues <- updateAll(ServerValues, ServerValues$text.column.4, 4)
+        incProgress(1, detail = "Finished...", session = ServerValues$monitor.domain)
+        updateJSON()
+      })
     })
     observeEvent({
       input$button.column.5
     }, {
       updateValues()
-      ServerValues <- updateAll(ServerValues, input$text.column.5, 5)
-      updateJSON()
+      withProgress(message = "Reloading...", value = 0, session = ServerValues$monitor.domain, {
+        incProgress(0, detail = "Updating Column...", session = ServerValues$monitor.domain)
+        ServerValues <- updateAll(ServerValues, ServerValues$text.column.5, 5)
+        incProgress(1, detail = "Finished...", session = ServerValues$monitor.domain)
+        updateJSON()
+      })
     })
     observeEvent({
       input$button.column.6
     }, {
       updateValues()
-      ServerValues <- updateAll(ServerValues, input$text.column.6, 6)
-      updateJSON()
+      withProgress(message = "Reloading...", value = 0, session = ServerValues$monitor.domain, {
+        incProgress(0, detail = "Updating Column...", session = ServerValues$monitor.domain)
+        ServerValues <- updateAll(ServerValues, ServerValues$text.column.6, 6)
+        incProgress(1, detail = "Finished...", session = ServerValues$monitor.domain)
+        updateJSON()
+      })
     })
     observeEvent({
       input$button.column.7
     }, {
       updateValues()
-      ServerValues <- updateAll(ServerValues, input$text.column.7, 7)
-      updateJSON()
+      withProgress(message = "Reloading...", value = 0, session = ServerValues$monitor.domain, {
+        incProgress(0, detail = "Updating Column...", session = ServerValues$monitor.domain)
+        ServerValues <- updateAll(ServerValues, ServerValues$text.column.7, 7)
+        incProgress(1, detail = "Finished...", session = ServerValues$monitor.domain)
+        updateJSON()
+      })
     })
     observeEvent({
       input$button.column.8
     }, {
       updateValues()
-      ServerValues <- updateAll(ServerValues, input$text.column.8, 8)
-      updateJSON()
+      withProgress(message = "Reloading...", value = 0, session = ServerValues$monitor.domain, {
+        incProgress(0, detail = "Updating Column...", session = ServerValues$monitor.domain)
+        ServerValues <- updateAll(ServerValues, ServerValues$text.column.8, 8)
+        incProgress(1, detail = "Finished...", session = ServerValues$monitor.domain)
+        updateJSON()
+      })
     })
     observeEvent({
       input$button.column.9
     }, {
       updateValues()
-      ServerValues <- updateAll(ServerValues, input$text.column.9, 9)
-      updateJSON()
+      withProgress(message = "Reloading...", value = 0, session = ServerValues$monitor.domain, {
+        incProgress(0, detail = "Updating Column...", session = ServerValues$monitor.domain)
+        ServerValues <- updateAll(ServerValues, ServerValues$text.column.9, 9)
+        incProgress(1, detail = "Finished...", session = ServerValues$monitor.domain)
+        updateJSON()
+      })
     })
     observeEvent({
       input$button.column.10
     }, {
       updateValues()
-      ServerValues <- updateAll(ServerValues, input$text.column.10, 10)
-      updateJSON()
+      withProgress(message = "Reloading...", value = 0, session = ServerValues$monitor.domain, {
+        incProgress(0, detail = "Updating Column...", session = ServerValues$monitor.domain)
+        ServerValues <- updateAll(ServerValues, ServerValues$text.column.10, 10)
+        incProgress(1, detail = "Finished...", session = ServerValues$monitor.domain)
+        updateJSON()
+      })
     })
     observeEvent({
       input$button.column.11
     }, {
       updateValues()
-      ServerValues <- updateAll(ServerValues, input$text.column.11, 11)
-      updateJSON()
+      withProgress(message = "Reloading...", value = 0, session = ServerValues$monitor.domain, {
+        incProgress(0, detail = "Updating Column...", session = ServerValues$monitor.domain)
+        ServerValues <- updateAll(ServerValues, ServerValues$text.column.11, 11)
+        incProgress(1, detail = "Finished...", session = ServerValues$monitor.domain)
+        updateJSON()
+      })
     })
     observeEvent({
       input$button.column.12
     }, {
       updateValues()
-      ServerValues <- updateAll(ServerValues, input$text.column.12, 12)
-      updateJSON()
+      withProgress(message = "Reloading...", value = 0, session = ServerValues$monitor.domain, {
+        incProgress(0, detail = "Updating Column...", session = ServerValues$monitor.domain)
+        ServerValues <- updateAll(ServerValues, ServerValues$text.column.12, 12)
+        incProgress(1, detail = "Finished...", session = ServerValues$monitor.domain)
+        updateJSON()
+      })
     })
     
   
