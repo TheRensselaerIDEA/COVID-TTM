@@ -1,0 +1,90 @@
+{
+  "data_file" : "data/period_5.df.Rdata",
+  "edge_colname" : "hashtags",
+  "nodes" : {
+    "node01" : {
+      "query" : {
+        "q" : null,
+        "colname" : null
+      },
+      "name" : null
+    },
+    "node02" : {
+      "query" : {
+        "q" : null,
+        "colname" : null
+      },
+      "name" : null
+    },
+    "node03" : {
+      "query" : {
+        "q" : null,
+        "colname" : null
+      },
+      "name" : null
+    },
+    "node04" : {
+      "query" : {
+        "q" : null,
+        "colname" : null
+      },
+      "name" : null
+    },
+    "node05" : {
+      "query" : {
+        "q" : null,
+        "colname" : null
+      },
+      "name" : null
+    },
+    "node06" : {
+      "query" : {
+        "q" : null,
+        "colname" : null
+      },
+      "name" : null
+    },
+    "node07" : {
+      "query" : {
+        "q" : null,
+        "colname" : null
+      },
+      "name" : null
+    },
+    "node08" : {
+      "query" : {
+        "q" : null,
+        "colname" : null
+      },
+      "name" : null
+    },
+    "node09" : {
+      "query" : {
+        "q" : null,
+        "colname" : null
+      },
+      "name" : null
+    },
+    "node10" : {
+      "query" : {
+        "q" : null,
+        "colname" : null
+      },
+      "name" : null
+    },
+    "node11" : {
+     "query" : {
+        "q" : null,
+        "colname" : null
+      },
+      "name" : null
+    },
+    "node12" : {
+      "query" : {
+        "q" : null,
+        "colname" : null
+      },
+      "name" : null
+    }
+  }
+}

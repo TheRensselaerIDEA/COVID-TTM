@@ -1,0 +1,18 @@
+{
+  "data_file" : "data/period_5_5.df.Rdata",
+  "edge_colnames" : ["hashtags", "user_mentions", "expanded_urls"],
+  "nodes" : {
+    "node01" : "label:BLM_1 group:1",
+    "node02" : "label:BIPARTISAN_+_ANONYMOUS group:2",
+    "node03" : "label:BLM_2 group:3",
+    "node04" : "label:BLACK_ENTERTAINERS group:4",
+    "node05" : "label:CONSERVATIVES group:5",
+    "node06" : "",
+    "node07" : "label:MAINSTREAM_NEWS_1 group:6",
+    "node08" : "label:MAINSTREAM_NEWS_2 group:7",
+    "node09" : "label:SPANISH/ENG_NEWS group:8",
+    "node10" : "label:TWITTER_HUMOR group:9",
+    "node11" : "label:YBT group:10",
+    "node12" : ""
+  }
+}

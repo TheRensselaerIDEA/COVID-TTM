@@ -1,0 +1,90 @@
+{
+  "data_file" : "data/period_5_4.df.Rdata",
+  "edge_colnames" : ["hashtags", "user_mentions", "expanded_urls"],
+  "nodes" : {
+    "node01" : {
+      "query" : {
+        "q" : "1",
+        "colname" : "group"
+      },
+      "name" : "BLM 1"
+    },
+    "node02" : {
+      "query" : {
+        "q" : "2",
+        "colname" : "group"
+      },
+      "name" : "BIPARTISAN + ANONYMOUS"
+    },
+    "node03" : {
+      "query" : {
+        "q" : "3",
+        "colname" : "group"
+      },
+      "name" : "BLM 2"
+    },
+    "node04" : {
+      "query" : {
+        "q" : "4",
+        "colname" : "group"
+      },
+      "name" : "BLACK ENTERTAINERS"
+    },
+    "node05" : {
+      "query" : {
+        "q" : "5",
+        "colname" : "group"
+      },
+      "name" : "CONSERVATIVES"
+    },
+    "node06" : {
+      "query" : {
+        "q" : null,
+        "colname" : null
+      },
+      "name" : null
+    },
+    "node07" : {
+      "query" : {
+        "q" : "6",
+        "colname" : "group"
+      },
+      "name" : "MAINSTREAM NEWS 1"
+    },
+    "node08" : {
+      "query" : {
+        "q" : "7",
+        "colname" : "group"
+      },
+      "name" : "MAINSTREAM NEWS 2"
+    },
+    "node09" : {
+      "query" : {
+        "q" : "8",
+        "colname" : "group"
+      },
+      "name" : "SPANISH/ENG NEWS"
+    },
+    "node10" : {
+      "query" : {
+        "q" : "9",
+        "colname" : "group"
+      },
+      "name" : "TWITTER HUMOR"
+    },
+    "node11" : {
+     "query" : {
+        "q" : "10",
+        "colname" : "group"
+      },
+      "name" : "YBT"
+    },
+    "node12" : {
+      "query" : {
+        "q" : null,
+        "colname" : null
+      },
+      "name" : null
+    }
+  }
+}
