@@ -99,6 +99,27 @@ campfireApp(
       },
       contentType = "application/json"
     )
+    
+    output$wall_ui <- renderUI({
+      fluidPage(
+        tags$script(HTML(
+          "$(document).on('click', '.clickable', function (event) {
+            var text =  $(this).text();
+            if(event.ctrlKey) {
+              Shiny.onInputChange('open_url', true)
+            } else {
+              Shiny.onInputChange('open_url', false)
+            }
+            Shiny.onInputChange('clicked_text', text);
+          });"
+        )),
+        fluidRow(
+          lapply(1:12, function(col.num) {
+            ServerValues$col_list[[col.num]]
+          })
+        )
+      )
+    })
 
     # render the floor
     output$network <- renderVisNetwork({
@@ -163,27 +184,6 @@ campfireApp(
       }
     })
     
-    output$wall_ui <- renderUI({
-      fluidPage(
-        tags$script(HTML(
-          "$(document).on('click', '.clickable', function (event) {
-            var text =  $(this).text();
-            if(event.ctrlKey) {
-              Shiny.onInputChange('open_url', true)
-            } else {
-              Shiny.onInputChange('open_url', false)
-            }
-            Shiny.onInputChange('clicked_text', text);
-          });"
-        )),
-        fluidRow(
-          lapply(1:12, function(col.num) {
-            ServerValues$col_list[[col.num]]
-          })
-        )
-      )
-    })
-
     output$top.users.bar.extern <- renderPlot({
       ServerValues$monitor.domain <- getDefaultReactiveDomain()
       ServerValues$data_subset %>%
@@ -191,15 +191,15 @@ campfireApp(
         arrange(desc(n)) %>%
         slice(1:10) %>%
         ggplot(aes(reorder(user_screen_name, n), n)) +
-          geom_col(fill = color.blue, color = color.blue) +
-          coord_flip() +
-          labs(x = "Screen Name", y = "Tweets", title = "Top 10 Users") +
-          theme_dark() +
-          theme(plot.background = element_rect(fill = color.back, color = NA),
-                  axis.text = element_text(size = 20, colour = color.white),
-                  text = element_text(size = 20, colour = color.blue))
+        geom_col(fill = color.blue, color = color.blue) +
+        coord_flip() +
+        labs(x = "Screen Name", y = "Tweets", title = "Top 10 Users") +
+        theme_dark() +
+        theme(plot.background = element_rect(fill = color.back, color = NA),
+              axis.text = element_text(size = 20, colour = color.white),
+              text = element_text(size = 20, colour = color.blue))
     })
-
+    
     output$tweets.by.time <- renderPlot({
       ServerValues$data_subset %>%
         group_by(group) %>%
