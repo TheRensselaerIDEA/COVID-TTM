@@ -314,7 +314,7 @@ getEdges <- function(data, node_queries, edge_colnames, nodes)
                         edge_colors[[j]],
                         rounds[[j]],
                         next_id)
-        next_id <- next_id + 1
+        if(!is.null(edge)) {next_id <- next_id + 1}
         edges <- rbind(edges, edge)
       }
     }
