@@ -221,7 +221,7 @@ campfireApp(
         redirectScript <- paste0("window = window.open('", ServerValues$url, "');")
         tags$script(HTML(redirectScript))
       } else {
-        redirectScript <- paste0("window = window.open('", "https://docs.google.com/presentation/d/1g_q5qQTJAt4jVekozFlEsnEo4XdveubVzLC2t9aeWlo/present", "');")
+        redirectScript <- paste0("window = window.open('", "https://docs.google.com/presentation/d/1A8A3tWGPeEGItIQnkTMMNSsm1lfcrVE73O22KJ7t--I/present", "');")
         tags$script(HTML(redirectScript))
       }
     })
