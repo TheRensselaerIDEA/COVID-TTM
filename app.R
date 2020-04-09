@@ -21,18 +21,18 @@ ui <- fluidPage(
   tags$div(
     class = "page",
     fluidRow(
-      column(12,
+      column(4,
              uiOutput("wall_info")
-             )#,
-      # column(8,
-      #        tags$h1(
-      #          textAreaInput("text_input",
-      #                        "JSON Text",
-      #                        value = read_file("test/test_ALLGROUPS_new.json"),
-      #                        height = '455px',
-      #                        width = "550px")
-      #        )
-      #        )
+             ),
+      column(8,
+             tags$h1(
+               textAreaInput("text_input",
+                             "JSON Text",
+                             value = read_file("test/test_ALLGROUPS_new.json"),
+                             height = '455px',
+                             width = "550px")
+             )
+             )
     )
   )
 )
