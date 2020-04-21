@@ -1,4 +1,5 @@
 h2 {
+  font-size:20px;
   color: #1D8DEE;
 }
 
@@ -8,6 +9,7 @@ h5 {
 }
 
 body {
+  font-size:15px;
   color: #f0f0f0;
 }
 

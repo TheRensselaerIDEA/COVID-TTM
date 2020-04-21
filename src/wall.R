@@ -24,7 +24,7 @@ updateWall <- function(data, nodes) {
 }
 
 getEmptyColumn <- function(col_num) {
-  column(width = 1,
+  column(width = 12,
          textInput(paste0("text.column.", col_num), label = ""),
          actionButton(paste0("button.column.", col_num), "Submit"))
 }
@@ -45,7 +45,7 @@ UpdateColumn <- function(data_subset, current_node_data, queries, col_num, heade
   # Returns:
   #   List of Shiny html columns containing tweet data.
   header_text <- current_node_data$name
-  column(width = 1,
+  column(width = 12,
          tags$div(includeCSS("wall.css"),
                   textInput(paste0("text.column.", col_num), label = "", value = current_node_data$query.repr),
                   actionButton(paste0("button.column.", col_num), "Submit"),
