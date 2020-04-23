@@ -29,6 +29,7 @@ ui <- fluidPage(
                ),
                column(5,
                       uiOutput("tweet_bar")
+                      # textOutput('click2')
                )
              )
             ),
@@ -48,6 +49,30 @@ ui <- fluidPage(
   )
 )
 
+nodeCorrector <- function(nodes, num) {
+  it = 0
+  lapply(1:num, function(x) {
+    if (!is.na(nodes[[7]][[x]])) {
+      # browser()
+      it <<- it + 1
+    }
+  })
+  # browser()
+  return(it)
+}
+
+selCorrector <- function(nodes, num) {
+  it = 0
+  lapply(1:12, function(x) {
+    if (is.na(nodes[[7]][[x]])  & ((x - it) <= num)) {
+      # browser()
+      it <<- it + 1
+    }
+  })
+  # browser()
+  return(it + num)
+}
+
 server <- function(input, output, session) {
   
   row_list <- reactiveVal()
@@ -59,7 +84,9 @@ server <- function(input, output, session) {
   network <- reactiveVal()
   edges <- reactiveVal()
   nodes <- reactiveVal()
+  parsed_json <- reactiveVal()
   
+
   updateComplete <- reactive({
     # if(is.null(monitor.domain))
     # {
@@ -72,13 +99,13 @@ server <- function(input, output, session) {
     withProgress(message = "Reloading...", value = 0, {#session = d, {
       tryCatch({
         incProgress(0, detail = "Getting Data...")#, session = d)
-        parsed_json <- fromJSON(text_input, nullValue = NA, simplify = FALSE)
-        data <- fetchData(parsed_json$data_file)
+        parsed_json(fromJSON(text_input, nullValue = NA, simplify = FALSE))
+        data <- fetchData(parsed_json()$data_file)
         data_subset <- data
         url_map <- getUrlMap(data)
-        edge_colnames <- parsed_json$edge_colnames
+        edge_colnames <- parsed_json()$edge_colnames
         incProgress(.2, detail = "Creating Nodes...")#, session = d)
-        columnQueries <- lapply(parsed_json$nodes, function(query) {
+        columnQueries <- lapply(parsed_json()$nodes, function(query) {
           if (query != "") {
             parseColumnQuery(query)
           }
@@ -152,139 +179,133 @@ server <- function(input, output, session) {
         fluidRow(
           tags$div(
             class = "node_box_outer",
-            actionButton("node1", "Node 1",
+            actionButton("node1",
+                         paste0("Node 1: ",
+                                ifelse(!is.na(nodes()[[7]][[1]]), nodes()[[7]][[1]], "NA")
+                                ),
+                         class="node_box")
+
+          )
+        ),
+        fluidRow(
+          tags$div(
+            class = "node_box_outer",
+            actionButton("node2",
+                         paste0("Node 2: ",
+                                ifelse(!is.na(nodes()[[7]][[2]]), nodes()[[7]][[2]], "NA")
+                         ),
+                         class="node_box")
+
+          )
+        ),
+        fluidRow(
+          tags$div(
+            class = "node_box_outer",
+            actionButton("node3",
+                         paste0("Node 3: ",
+                                ifelse(!is.na(nodes()[[7]][[3]]), nodes()[[7]][[3]], "NA")
+                         ),
+                         class="node_box")
+
+          )
+        ),
+        fluidRow(
+          tags$div(
+            class = "node_box_outer",
+            actionButton("node4",
+                         paste0("Node 4: ",
+                                ifelse(!is.na(nodes()[[7]][[4]]), nodes()[[7]][[4]], "NA")
+                         ),
+                         class="node_box")
+
+          )
+        ),
+        fluidRow(
+          tags$div(
+            class = "node_box_outer",
+            actionButton("node5",
+                         paste0("Node 5: ",
+                                ifelse(!is.na(nodes()[[7]][[5]]), nodes()[[7]][[5]], "NA")
+                         ),
+                         class="node_box")
+
+          )
+        ),
+        fluidRow(
+          tags$div(
+            class = "node_box_outer",
+            actionButton("node6",
+                         paste0("Node 6: ",
+                                ifelse(!is.na(nodes()[[7]][[6]]), nodes()[[7]][[6]], "NA")
+                         ),
+                         class="node_box")
+
+          )
+        ),
+        fluidRow(
+          tags$div(
+            class = "node_box_outer",
+            actionButton("node7",
+                         paste0("Node 7: ",
+                                ifelse(!is.na(nodes()[[7]][[7]]), nodes()[[7]][[7]], "NA")
+                         ),
+                         class="node_box")
+
+          )
+        ),
+        fluidRow(
+          tags$div(
+            class = "node_box_outer",
+            actionButton("node8",
+                         paste0("Node 8: ",
+                                ifelse(!is.na(nodes()[[7]][[8]]), nodes()[[7]][[8]], "NA")
+                         ),
                          class="node_box")
             # tags$div(
-            #   id="node1",
-            #   class = "node_box",
-            #   tags$p(paste0("Node 1"))
-            # )
+
           )
         ),
         fluidRow(
           tags$div(
             class = "node_box_outer",
-            actionButton("node2", "Node 2",class="node_box")
-            # tags$div(
-            #   id="node2",
-            #   class = "node_box",
-            #   tags$p("Node 2")
-            #   
-            # )
+            actionButton("node9",
+                         paste0("Node 9: ",
+                                ifelse(!is.na(nodes()[[7]][[9]]), nodes()[[7]][[9]], "NA")
+                         ),
+                         class="node_box")
+
           )
         ),
         fluidRow(
           tags$div(
             class = "node_box_outer",
-            actionButton("node3", "Node 3",class = "node_box")
-            # tags$div(
-            #   id="node3",
-            #   class = "node_box",
-            #   tags$p("Node 3")
-            #   
-            # )
+            actionButton("node10",
+                         paste0("Node 10: ",
+                                ifelse(!is.na(nodes()[[7]][[10]]), nodes()[[7]][[10]], "NA")
+                         ),
+                         class="node_box")
+
           )
         ),
         fluidRow(
           tags$div(
             class = "node_box_outer",
-            actionButton("node4", "Node 4",class = "node_box")
-            # tags$div(
-            #   id="node4",
-            #   class = "node_box",
-            #   tags$p("Node 4")
-            #   
-            # )
+            actionButton("node11",
+                         paste0("Node 11: ",
+                                ifelse(!is.na(nodes()[[7]][[11]]), nodes()[[7]][[11]], "NA")
+                         ),
+                         class="node_box")
+
           )
         ),
         fluidRow(
           tags$div(
             class = "node_box_outer",
-            actionButton("node5", "Node 5",class = "node_box")
-            # tags$div(
-            #   id="node5",
-            #   class = "node_box",
-            #   tags$p("Node 5")
-            #   
-            # )
-          )
-        ),
-        fluidRow(
-          tags$div(
-            class = "node_box_outer",
-            actionButton("node6", "Node 6",class = "node_box")
-            # tags$div(
-            #   id="node6",
-            #   class = "node_box",
-            #   tags$p("Node 6")
-            #   
-            # )
-          )
-        ),
-        fluidRow(
-          tags$div(
-            class = "node_box_outer",
-            actionButton("node7", "Node 7",class = "node_box")
-            # tags$div(
-            #   id="node7",
-            #   class = "node_box",
-            #   tags$p("Node 7")
-            # )
-          )
-        ),
-        fluidRow(
-          tags$div(
-            class = "node_box_outer",
-            actionButton("node8", "Node 8",class = "node_box")
-            # tags$div(
-            #   id="node8",
-            #   class = "node_box",
-            #   tags$p("Node 8")
-            # )
-          )
-        ),
-        fluidRow(
-          tags$div(
-            class = "node_box_outer",
-            actionButton("node9", "Node 9",class = "node_box")
-            # tags$div(
-            #   id="node9",
-            #   class = "node_box",
-            #   tags$p("Node 9")
-            # )
-          )
-        ),
-        fluidRow(
-          tags$div(
-            class = "node_box_outer",
-            actionButton("node10", "Node 10",class = "node_box")
-            # tags$div(
-            #   id="node10",
-            #   class = "node_box",
-            #   tags$p("Node 10")
-            # )
-          )
-        ),
-        fluidRow(
-          tags$div(
-            class = "node_box_outer",
-            actionButton("node11", "Node 11",class = "node_box")
-            # tags$div(
-            #   id="node11",
-            #   class = "node_box",
-            #   tags$p("Node 11")
-            # )
-          )
-        ),
-        fluidRow(
-          tags$div(
-            class = "node_box_outer",
-            actionButton("node12", "Node 12",class = "node_box")
-            # tags$div(
-            #   id="node12",
-            #   class = "node_box",
-            #   tags$p("Node 12")
-            # )
+            actionButton("node12",
+                         paste0("Node 12: ",
+                                ifelse(!is.na(nodes()[[7]][[12]]), nodes()[[7]][[12]], "NA")
+                         ),
+                         class="node_box")
           )
         )
       )
@@ -310,65 +331,6 @@ server <- function(input, output, session) {
   })
   
 
-  observeEvent(input$node1, {
-    # browser()
-    node_shown(1)
-  })
-  
-  observeEvent(input$node2, {
-    # browser()
-    node_shown(2)
-  })
-  
-  observeEvent(input$node3, {
-    # browser()
-    node_shown(3)
-  })
-  
-  observeEvent(input$node4, {
-    # browser()
-    node_shown(4)
-  })
-  
-  observeEvent(input$node5, {
-    # browser()
-    node_shown(5)
-  })
-  
-  observeEvent(input$node6, {
-    # browser()
-    node_shown(6)
-  })
-  
-  observeEvent(input$node7, {
-    # browser()
-    node_shown(7)
-  })
-  
-  observeEvent(input$node8, {
-    # browser()
-    node_shown(8)
-  })
-  
-  observeEvent(input$node9, {
-    # browser()
-    node_shown(9)
-  })
-  
-  observeEvent(input$node10, {
-    # browser()
-    node_shown(10)
-  })
-  
-  observeEvent(input$node11, {
-    # browser()
-    node_shown(11)
-  })
-  
-  observeEvent(input$node12, {
-    # browser()
-    node_shown(12)
-  })
   
   # render the floor
   output$network <- renderVisNetwork({
@@ -381,7 +343,7 @@ server <- function(input, output, session) {
                               x: 0,
                               y: 0
                             },
-                      scale: .7
+                      scale: .65
               })
             }") %>%
         visEvents(
@@ -393,14 +355,148 @@ server <- function(input, output, session) {
                                          Shiny.onInputChange('current_edge_index', -1);
                                        }
                                      }"
+        ) %>%
+        visEvents(
+          selectNode = "function(node) {
+                                  Shiny.onInputChange('click', node.nodes[0]);
+                               }"
         )
     }
   }
   )
-
+  
+  proxy <- visNetworkProxy("network")
+  
+  observeEvent(input$click, {
+    # browser()
+    node_shown(selCorrector(nodes(), as.numeric(input$click)))
+  })
+  
+  
+  observeEvent(input$node1, {
+    # browser()
+    node_shown(1)
+    if (parsed_json()$nodes$node01 != "")
+      visSelectNodes(proxy, nodeCorrector(nodes(),1))
+    else {
+      visUnselectAll(proxy)
+    }
+  })
+  
+  observeEvent(input$node2, {
+    # browser()
+    node_shown(2)
+    if (parsed_json()$nodes$node02 != "")
+      visSelectNodes(proxy, nodeCorrector(nodes(),2))
+    else {
+      visUnselectAll(proxy)
+    }
+  })
+  
+  observeEvent(input$node3, {
+    # browser()
+    node_shown(3)
+    if (parsed_json()$nodes$node03 != "")
+      visSelectNodes(proxy, nodeCorrector(nodes(),3))
+    else {
+      visUnselectAll(proxy)
+    }
+  })
+  
+  observeEvent(input$node4, {
+    # browser()
+    node_shown(4)
+    if (parsed_json()$nodes$node04 != "")
+      visSelectNodes(proxy, nodeCorrector(nodes(),4))
+    else {
+      visUnselectAll(proxy)
+    }
+  })
+  
+  observeEvent(input$node5, {
+    # browser()
+    node_shown(5)
+    if (parsed_json()$nodes$node05 != "")
+      visSelectNodes(proxy, nodeCorrector(nodes(),5))
+    else {
+      visUnselectAll(proxy)
+    }
+  })
+  
+  observeEvent(input$node6, {
+    # browser()
+    node_shown(6)
+    if (parsed_json()$nodes$node06 != "")
+      visSelectNodes(proxy, nodeCorrector(nodes(),6))
+    else {
+      visUnselectAll(proxy)
+    }
+  })
+  
+  observeEvent(input$node7, {
+    # browser()
+    node_shown(7)
+    if (parsed_json()$nodes$node07 != "")
+      visSelectNodes(proxy, nodeCorrector(nodes(),7))
+    else {
+      visUnselectAll(proxy)
+    }
+  })
+  
+  observeEvent(input$node8, {
+    # browser()
+    node_shown(8)
+    if (parsed_json()$nodes$node08 != "")
+      visSelectNodes(proxy, nodeCorrector(nodes(),8))
+    else {
+      visUnselectAll(proxy)
+    }
+  })
+  
+  observeEvent(input$node9, {
+    # browser()
+    node_shown(9)
+    if (parsed_json()$nodes$node09 != "")
+      visSelectNodes(proxy, nodeCorrector(nodes(),9))
+    else {
+      visUnselectAll(proxy)
+    }
+  })
+  
+  observeEvent(input$node10, {
+    # browser()
+    node_shown(10)
+    if (parsed_json()$nodes$node10 != "")
+      visSelectNodes(proxy, nodeCorrector(nodes(),10))
+    else {
+      visUnselectAll(proxy)
+    }
+  })
+  
+  observeEvent(input$node11, {
+    # browser()
+    node_shown(11)
+    if (parsed_json()$nodes$node11 != "")
+      visSelectNodes(proxy, nodeCorrector(nodes(),11))
+    else {
+      visUnselectAll(proxy)
+    }
+  })
+  
+  observeEvent(input$node12, {
+    # browser()
+    node_shown(12)
+    if (parsed_json()$nodes$node12 != "")
+      visSelectNodes(proxy, nodeCorrector(nodes(),12))
+    else {
+      visUnselectAll(proxy)
+    }
+  })
     
-    
-    
+  # output$click2 <- renderText({
+  #   req(input$click)
+  #   selCorrector(nodes, as.numeric(input$click))
+  # })
     
 
 
