@@ -77,7 +77,7 @@ server <- function(input, output, session) {
   
   row_list <- reactiveVal()
   text_input <- read_file("test/test_ALLGROUPS_new.json")
-  node_shown <- reactiveVal(2)
+  node_shown <- reactiveVal(1)
   
   
 
@@ -498,6 +498,37 @@ server <- function(input, output, session) {
   #   selCorrector(nodes, as.numeric(input$click))
   # })
     
+  
+  observeEvent(input$delete_node, {
+    # Update the data when a node is deleted.
+    #
+    # Event:
+    #   Node is double clicked on the floor
+    #$nodes <- $nodes[$nodes$id != input$delete_node, ]
+    # updateValues()
+    # updateValues()
+    withProgress(message = "Reloading...", value = 0, {# session = monitor.domain, {
+      incProgress(0, detail = "Updating Column...")#, session = monitor.domain)
+      deletedIndex <- which(!is.na(nodes()$id) & nodes()$id == input$delete_node)[1]
+      browser()
+      # nodes()[deletedIndex, ]$hidden <- TRUE
+      # nodes()[deletedIndex, ]$id <- NA
+      nodes()[deletedIndex, ]$name <- NA
+      nodes()[deletedIndex, ]$colname <- NA
+      nodes()[deletedIndex, ]$colvalue <- NA
+      nodes()[deletedIndex, ]$query.query.q <- NA
+      nodes()[deletedIndex, ]$query.query.colname <- NA
+      nodes()[deletedIndex, ]$query.name <- NA
+      nodes()[deletedIndex, ]$query.repr <- NA
+      nodes()[deletedIndex, ]$orig_indices <- NA
+      # browser()
+      col_list[[deletedIndex]] <- getEmptyColumn(deletedIndex)
+      data_subset <- data
+      network_selected <- ""
+      incProgress(1, detail = "Finished...")#, session = monitor.domain)
+      # updateJSON()
+    })
+  })
 
 
   
